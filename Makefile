@@ -26,7 +26,7 @@ CFLAGS_CPP = -std=c++11
 LFLAGS = `pkg-config --libs opencv` 
 
 # demo
-DEMO_IMAGE = stallman.jpg
+DEMO_IMAGE = stallman_small.jpg
 DEMO_CLUSTERS = 10
 
 # rules
