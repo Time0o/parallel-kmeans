@@ -1,4 +1,5 @@
+build/
 c/obj/
 cpp/obj/
-build/
 images/
+tmp/

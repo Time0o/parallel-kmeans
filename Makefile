@@ -1,41 +1,63 @@
 # directories
-C_SRC_DIR = c
-CPP_SRC_DIR = cpp
+C_SRC_DIR=c/src
+C_OBJ_DIR=c/obj
+C_INCLUDE_DIR=c/include
 
-C_OBJ_DIR = $(C_SRC_DIR)/obj
-CPP_OBJ_DIR = $(CPP_SRC_DIR)/obj
+CPP_SRC_DIR=cpp/src
+CPP_OBJ_DIR=cpp/obj
+CPP_INCLUDE_DIR=cpp/include
 
-INCLUDE_DIR = include
-BUILD_DIR = build
-IMAGE_DIR = images
+CONFIG_DIR=config
+BUILD_DIR=build
+IMAGE_DIR=images
 
 # files
-_DEPS = kmeans.h
-DEPS = $(patsubst %, $(INCLUDE_DIR)/%, $(_DEPS))
+_CONFIG_DEPS=kmeans_config.h
+CONFIG_DEPS=$(patsubst %, $(CONFIG_DIR)/%, $(_CONFIG_DEPS))
 
-_C_OBJ = kmeans.o
-C_OBJ = $(patsubst %, $(C_OBJ_DIR)/%, $(_C_OBJ))
+_C_DEPS=kmeans_c.h
+C_DEPS=$(patsubst %, $(C_INCLUDE_DIR)/%, $(_C_DEPS))
 
-_CPP_OBJ = kmeans_wrapper.o
-CPP_OBJ = $(patsubst %, $(CPP_OBJ_DIR)/%, $(_CPP_OBJ))
+_CPP_DEPS=kmeans_wrapper.h
+CPP_DEPS=$(patsubst %, $(CPP_INCLUDE_DIR)/%, $(_CPP_DEPS))
 
-# compilation options
-CFLAGS_COMMON = -Wall -g -O3 -I$(INCLUDE_DIR) `pkg-config --cflags opencv` 
-CFLAGS_CPP = -std=c++11
+DEPS=$(CONFIG_DEPS) $(C_DEPS) $(CPP_DEPS)
 
-LFLAGS = `pkg-config --libs opencv` 
+_C_OBJ=kmeans_c.o
+C_OBJ=$(patsubst %, $(C_OBJ_DIR)/%, $(_C_OBJ))
 
-# demo
-DEMO_IMAGE = stallman_small.jpg
-DEMO_CLUSTERS = 10
+_CPP_OBJ=kmeans_demo.o kmeans_wrapper.o
+CPP_OBJ=$(patsubst %, $(CPP_OBJ_DIR)/%, $(_CPP_OBJ))
+
+# flags
+COMMON_CFLAGS=-Wall -g -O0 -I$(CONFIG_DIR) -I$(C_INCLUDE_DIR) \
+  -I$(CPP_INCLUDE_DIR) -fopenmp
+
+C_CFLAGS=-std=c99 $(COMMON_CFLAGS)
+CPP_CFLAGS=-std=c++11 $(COMMON_CFLAGS) `pkg-config --cflags opencv`
+
+LFLAGS=`pkg-config --libs opencv` -fopenmp
+
+# demo parameters
+DEMO_CLUSTERS=10
+DEMO_IMAGE=stallman_small.jpg
 
 # rules
-kmeans_demo: $(C_OBJ) $(CPP_OBJ)
-	g++ -o $(BUILD_DIR)/$@ $(C_OBJ) $(CPP_OBJ) $(LFLAGS)
-	./$(BUILD_DIR)/$@ $(IMAGE_DIR)/$(DEMO_IMAGE) $(DEMO_CLUSTERS)
+all: $(C_OBJ) $(CPP_OBJ)
 
-$(C_OBJ_DIR)/%.o: $(C_SRC_DIR)/%.c $(DEPS)
-	gcc -c -o $@ $< $(CFLAGS_COMMON)
+demo: all
+	g++ -o $(BUILD_DIR)/$@ $(C_OBJ) $(CPP_OBJ) $(LFLAGS)
+	@chmod +x $(BUILD_DIR)/$@
+	OMP_NUM_THREADS=4 ./$(BUILD_DIR)/$@ $(IMAGE_DIR)/$(DEMO_IMAGE) $(DEMO_CLUSTERS)
+
+$(C_OBJ_DIR)/%.o: $(C_SRC_DIR)/%.c $(C_DEPS) $(CONFIG_DEPS)
+	gcc -c -o $@ $< $(C_CFLAGS)
 
 $(CPP_OBJ_DIR)/%.o: $(CPP_SRC_DIR)/%.cc $(DEPS)
-	g++ -c -o $@ $< $(CFLAGS_COMMON) $(CFLAGS_CPP)
+	g++ -c -o $@ $< $(CPP_CFLAGS)
+
+.PHONY: clean
+clean:
+	-@rm $(C_OBJ_DIR)/*.o 2> /dev/null || true
+	-@rm $(CPP_OBJ_DIR)/*.o 2> /dev/null || true
+	-@rm $(BUILD_DIR)/* 2> /dev/null || true
