@@ -11,7 +11,7 @@ public:
     Wrapper() {}
     virtual ~Wrapper() {}
 
-    virtual void exec(cv::Mat const &image, cv::Mat const &initial_clusters) = 0;
+    virtual void exec(cv::Mat const &image, cv::Mat const &initial_centroids) = 0;
 
     cv::Mat get_result() { return result; };
     double get_exec_time() { return _exec_time; };
@@ -30,14 +30,14 @@ class CWrapper : public Wrapper
 {
 public:
     CWrapper() {}
-    void exec(cv::Mat const &image, cv::Mat const &initial_clusters);
+    void exec(cv::Mat const &image, cv::Mat const &initial_centroids);
 };
 
 class OpenCVWrapper : public Wrapper
 {
 public:
     OpenCVWrapper() {}
-    void exec(cv::Mat const &image, cv::Mat const &initial_clusters);
+    void exec(cv::Mat const &image, cv::Mat const &initial_centroids);
 };
 
 }

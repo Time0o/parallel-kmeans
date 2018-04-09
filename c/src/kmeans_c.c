@@ -6,14 +6,14 @@
 #include "kmeans_c.h"
 
 void kmeans_c(double **data_points, int n_data_points,
-              double **centroids, int n_centroids, int *labels)
+              double **centroids, int n_clusters, int *labels)
 {
     for (int iter = 0; iter < KMEANS_MAX_ITER; ++iter) {
 
         /* assign labels to data points */
         for (int d = 0; d < n_data_points; ++d) {
             double min_dist = -1.0;
-            for (int c = 0; c < n_centroids; ++c) {
+            for (int c = 0; c < n_clusters; ++c) {
                 double *dp = data_points[d];
                 double *centr = centroids[c];
 
@@ -29,13 +29,13 @@ void kmeans_c(double **data_points, int n_data_points,
         }
 
         /* null centroids */
-        for (int c = 0; c < n_centroids; ++c) {
+        for (int c = 0; c < n_clusters; ++c) {
             centroids[c][0] = 0.0;
             centroids[c][1] = 0.0;
             centroids[c][2] = 0.0;
         }
 
-        int *points_per_cluster = calloc(n_centroids, sizeof(int));
+        int *points_per_cluster = calloc(n_clusters, sizeof(int));
 
         /* sum data points for each centroid */
         for (int d = 0; d < n_data_points; ++d) {
@@ -51,7 +51,7 @@ void kmeans_c(double **data_points, int n_data_points,
         }
 
         /* normalize centroids */
-        for (int c = 0; c < n_centroids; ++c) {
+        for (int c = 0; c < n_clusters; ++c) {
             double *centr = centroids[c];
             int n_points = points_per_cluster[c];
 
