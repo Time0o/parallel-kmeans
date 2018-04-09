@@ -2,8 +2,6 @@
 #include <stdlib.h> /* malloc(), free() */
 #include <string.h> /* memset() */
 
-#include <omp.h>
-
 #include "kmeans_config.h"
 #include "kmeans_c.h"
 
