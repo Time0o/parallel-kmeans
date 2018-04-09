@@ -1,5 +1,8 @@
-build/
-c/obj/
-cpp/obj/
-images/
-tmp/
+build/*
+!build/.gitkeep
+c/obj/*
+!c/obj/.gitkeep
+cpp/obj/*
+!cpp/obj/.gitkeep
+images/*
+!images/.gitkeep
