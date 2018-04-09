@@ -39,7 +39,7 @@ CPP_CFLAGS=-std=c++11 $(COMMON_CFLAGS) `pkg-config --cflags opencv`
 LFLAGS=`pkg-config --libs opencv` -fopenmp
 
 # demo parameters
-DEMO_CLUSTERS=10
+DEMO_CLUSTERS=3
 DEMO_IMAGE=stallman_small.jpg
 
 # rules
