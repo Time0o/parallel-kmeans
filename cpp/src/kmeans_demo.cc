@@ -33,10 +33,6 @@ int main(int argc, char **argv)
 
         if (idx != strlen(argv[2]))
             throw std::invalid_argument("trailing garbage");
-        else if (n_clusters <= 0 || n_clusters > KMEANS_MAX_CLUSTERS)
-            throw std::invalid_argument(
-                "must be in range [1, " +
-                std::to_string(KMEANS_MAX_CLUSTERS) + "]");
 
     } catch (std::exception const &e) {
         std::cerr << "Failed to parse number of clusters: " << e.what() << "\n";
