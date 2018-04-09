@@ -11,7 +11,7 @@
 
 int main(int argc, char **argv)
 {
-    cv::Mat image, initial_clusters;
+    cv::Mat image;
     int n_clusters;
 
     if (argc < 3) {
@@ -43,22 +43,17 @@ int main(int argc, char **argv)
         return 3;
     }
 
-    // initialize clusters to random color values
-    initial_clusters = cv::Mat(n_clusters, 1, CV_8UC3);
-    for (int c = 0; c < n_clusters; ++c) {
-        int row = rand() % image.rows;
-        int col = rand() % image.cols;
-        initial_clusters.at<cv::Vec3b>(c, 0) = image.at<cv::Vec3b>(row, col);
-    }
-
     // initialize implementation variants
     std::vector<std::pair<char const *, kmeans::Wrapper *>> impl;
 
-    kmeans::CWrapper c_wrapper;
-    impl.push_back(std::make_pair("Pure C", &c_wrapper));
-
     kmeans::OpenCVWrapper opencv_wrapper;
     impl.push_back(std::make_pair("OpenCV", &opencv_wrapper));
+
+    kmeans::C2DWrapper c2d_wrapper;
+    impl.push_back(std::make_pair("Pure C (2D input array)", &c2d_wrapper));
+
+    kmeans::CWrapper c_wrapper;
+    impl.push_back(std::make_pair("Pure C (1D input array)", &c_wrapper));
 
     // setup results display window
     const int margin = 10;
@@ -74,7 +69,7 @@ int main(int argc, char **argv)
 
         // get result and execution time for each wrapper
         kmeans::Wrapper *wrapper = std::get<1>(pane);
-        wrapper->exec(image, initial_clusters);
+        wrapper->exec(image, n_clusters);
         cv::Mat result = wrapper->get_result();
         double exec_time = wrapper->get_exec_time();
 
@@ -94,7 +89,6 @@ int main(int argc, char **argv)
     }
 
     image.release();
-    initial_clusters.release();
 
     // display window
     std::string disp_title(argv[1]);
