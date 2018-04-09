@@ -1,7 +1,6 @@
-#include <iomanip>
+#include <cstring> // strlen
 #include <iostream>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include <opencv2/opencv.hpp>
@@ -16,14 +15,14 @@ int main(int argc, char **argv)
 
     if (argc < 3) {
         std::cerr << "Usage: " << argv[0] << " IMAGE CLUSTERS\n";
-        return 1;
+        return -1;
     }
 
     // load image
     image = cv::imread(argv[1]);
     if (image.empty()) {
         std::cerr << "Failed to load image file '" << argv[1] << "'\n";
-        return 2;
+        return -1;
     }
 
     // parse number of clusters
@@ -35,8 +34,8 @@ int main(int argc, char **argv)
             throw std::invalid_argument("trailing garbage");
 
     } catch (std::exception const &e) {
-        std::cerr << "Failed to parse number of clusters: " << e.what() << "\n";
-        return 3;
+        std::cerr << "Failed to parse number of clusters: " << e.what() << '\n';
+        return -1;
     }
 
     // initialize implementation variants
