@@ -9,7 +9,44 @@ extern "C" {
 
 namespace kmeans {
 
-void CWrapper::exec(cv::Mat const &image, cv::Mat const &initial_centroids) {
+void CWrapper::exec(cv::Mat const &image, int n_clusters) {
+
+    // transform data points into **double format
+    int n_data_points = image.rows * image.cols;
+
+    std::vector<double> data_points(3 * n_data_points);
+    for (int y = 0; y < image.rows; ++y) {
+        for(int x = 0; x < image.cols; ++x) {
+            int idx = 3 * (y * image.cols + x);
+            for (int i = 0; i < 3; ++i)
+                data_points[idx + i] = image.at<cv::Vec3b>(y, x)[i];
+        }
+    }
+
+    // allocate space for centroids
+    std::vector<double> centroids(3 * n_clusters);
+
+    // allocate space for labels
+    std::vector<int> labels(n_data_points);
+
+    // perform calculations
+    start_timer();
+    kmeans_c(&data_points[0], n_data_points,
+             &centroids[0], n_clusters, &labels[0]);
+    stop_timer();
+
+    // rebuild image from results
+    result = cv::Mat(image.size(), image.type());
+    for (int y = 0; y < image.rows; ++y) {
+        for (int x = 0; x < image.cols; ++x) {
+            int idx = 3 * labels[y * image.cols + x];
+            for (int i = 0; i < 3; ++i)
+                result.at<cv::Vec3b>(y, x)[i] = centroids[idx + i];
+        }
+    }
+}
+
+void C2DWrapper::exec(cv::Mat const &image, int n_clusters) {
 
     // transform data points into **double format
     int n_data_points = image.rows * image.cols;
@@ -26,22 +63,17 @@ void CWrapper::exec(cv::Mat const &image, cv::Mat const &initial_centroids) {
         }
     }
 
-    // transform cluster centers into **double format
-    int n_clusters = initial_centroids.rows;
-
+    // allocate space for centroids
     double **centroids = new double*[n_clusters];
-    for (int c = 0; c < n_clusters; ++c) {
+    for (int c = 0; c < n_clusters; ++c)
         centroids[c] = new double[3];
-        for (int i = 0; i < 3; ++i)
-            centroids[c][i] = initial_centroids.at<cv::Vec3b>(c, 0)[i];
-    }
 
     // allocate space for labels
     std::vector<int> labels(n_data_points);
 
     // perform calculations
     start_timer();
-    kmeans_c(data_points, n_data_points, centroids, n_clusters, &labels[0]);
+    kmeans_c2d(data_points, n_data_points, centroids, n_clusters, &labels[0]);
     stop_timer();
 
     // rebuild image from results
@@ -64,9 +96,7 @@ void CWrapper::exec(cv::Mat const &image, cv::Mat const &initial_centroids) {
     delete[] centroids;
 }
 
-void OpenCVWrapper::exec(cv::Mat const &image, cv::Mat const &initial_centroids) {
-
-    cv::Mat centroids = initial_centroids.clone();
+void OpenCVWrapper::exec(cv::Mat const &image, int n_clusters) {
 
     // construct input data points vector
     cv::Mat data_points(image.rows * image.cols, 3, CV_32F);
@@ -81,19 +111,23 @@ void OpenCVWrapper::exec(cv::Mat const &image, cv::Mat const &initial_centroids)
     // allocate space for labels
     cv::Mat labels;
 
+    // transform cluster centers into **double format
+    cv::Mat centroids;
+
     // specify termination criteria
     cv::TermCriteria term(CV_TERMCRIT_ITER, KMEANS_MAX_ITER, 0);
 
     // perform calculations
     start_timer();
-    cv::kmeans(data_points, centroids.rows, labels, term, 1, 0, centroids);
+    cv::kmeans(data_points, n_clusters, labels, term, 1,
+               cv::KMEANS_RANDOM_CENTERS, centroids);
     stop_timer();
 
     // rebuild image from results
     result = cv::Mat(image.size(), image.type());
     for (int y = 0; y < image.rows; ++y) {
         for (int x = 0; x < image.cols; ++x) {
-            int idx = labels.at<size_t>(y * image.cols +  x, 0);
+            int idx = labels.at<int>(y * image.cols +  x, 0);
             for (int i = 0; i < 3; ++i)
                 result.at<cv::Vec3b>(y, x)[i] = centroids.at<float>(idx, i);
         }
