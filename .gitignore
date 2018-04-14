@@ -6,3 +6,5 @@ cpp/obj/*
 !cpp/obj/.gitkeep
 images/*
 !images/.gitkeep
+report/aux/*
+report/pdf/*
