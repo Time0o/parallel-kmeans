@@ -1,4 +1,4 @@
-#include <cstring> // strlen
+#include <cstring>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -39,16 +39,16 @@ int main(int argc, char **argv)
     }
 
     // initialize implementation variants
-    std::vector<std::pair<char const *, kmeans::Wrapper *>> impl;
+    std::vector<std::pair<char const *, KmeansWrapper *>> impl;
 
-    kmeans::OpenCVWrapper opencv_wrapper;
+    KmeansOpenCVWrapper opencv_wrapper;
     impl.push_back(std::make_pair("OpenCV", &opencv_wrapper));
 
-    kmeans::C2DWrapper c2d_wrapper;
-    impl.push_back(std::make_pair("Pure C (2D input array)", &c2d_wrapper));
+    KmeansPureCWrapper pure_c_wrapper;
+    impl.push_back(std::make_pair("Pure C", &pure_c_wrapper));
 
-    kmeans::CWrapper c_wrapper;
-    impl.push_back(std::make_pair("Pure C (1D input array)", &c_wrapper));
+    KmeansOMPWrapper omp_c_wrapper;
+    impl.push_back(std::make_pair("C + OpenMP", &omp_c_wrapper));
 
     // setup results display window
     const int margin = 10;
@@ -63,7 +63,7 @@ int main(int argc, char **argv)
         char const *title = std::get<0>(pane);
 
         // get result and execution time for each wrapper
-        kmeans::Wrapper *wrapper = std::get<1>(pane);
+        KmeansWrapper *wrapper = std::get<1>(pane);
         wrapper->exec(image, n_clusters);
         cv::Mat result = wrapper->get_result();
         double exec_time = wrapper->get_exec_time();
