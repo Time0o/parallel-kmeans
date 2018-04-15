@@ -46,7 +46,7 @@ LFLAGS=`pkg-config --libs opencv` -fopenmp
 
 #functions
 define run_pdflatex
-	pdflatex -halt-on-error -output-directory $(REPORT_AUX_DIR) $< > /dev/null
+	pdflatex -halt-on-error -shell-escape -output-directory $(REPORT_AUX_DIR) $< > /dev/null
 endef
 
 # benchmark parameters
