@@ -15,9 +15,6 @@ REPORT_AUX_DIR=$(REPORT_DIR)/aux
 REPORT_PDF_DIR=$(REPORT_DIR)/pdf
 REPORT_TEX_DIR=$(REPORT_DIR)/tex
 
-CC_C=gcc
-CC_CPP=g++
-
 # files
 _CONFIG_DEPS=kmeans_config.h
 CONFIG_DEPS=$(patsubst %, $(CONFIG_DIR)/%, $(_CONFIG_DEPS))
@@ -36,9 +33,11 @@ C_OBJ=$(patsubst %, $(C_OBJ_DIR)/%, $(_C_OBJ))
 _CPP_OBJ=kmeans_demo.o kmeans_wrapper.o
 CPP_OBJ=$(patsubst %, $(CPP_OBJ_DIR)/%, $(_CPP_OBJ))
 
-# flags
-COMMON_CFLAGS=-Wall -g -O0 -I$(CONFIG_DIR) -I$(C_INCLUDE_DIR) \
-  -I$(CPP_INCLUDE_DIR) -fopenmp
+# compilation settings
+CC_C=gcc
+CC_CPP=g++
+
+COMMON_CFLAGS=-Wall -g -O0 -I$(CONFIG_DIR) -I$(C_INCLUDE_DIR) -I$(CPP_INCLUDE_DIR) -fopenmp
 
 C_CFLAGS=-std=c99 $(COMMON_CFLAGS)
 CPP_CFLAGS=-std=c++11 $(COMMON_CFLAGS) `pkg-config --cflags opencv`
@@ -75,8 +74,8 @@ $(CPP_OBJ_DIR)/%.o: $(CPP_SRC_DIR)/%.cc $(DEPS)
 
 .PHONY: clean
 clean:
-	-@rm $(C_OBJ_DIR)/*.o 2> /dev/null || true
-	-@rm $(CPP_OBJ_DIR)/*.o 2> /dev/null || true
-	-@rm $(BUILD_DIR)/* 2> /dev/null || true
-	-@rm $(REPORT_AUX_DIR)/* 2> /dev/null || true
-	-@rm $(REPORT_PDF_DIR)/* 2> /dev/null || true
+	rm $(C_OBJ_DIR)/*.o 2> /dev/null || true
+	rm $(CPP_OBJ_DIR)/*.o 2> /dev/null || true
+	rm $(BUILD_DIR)/* 2> /dev/null || true
+	rm $(REPORT_AUX_DIR)/* 2> /dev/null || true
+	rm $(REPORT_PDF_DIR)/* 2> /dev/null || true
