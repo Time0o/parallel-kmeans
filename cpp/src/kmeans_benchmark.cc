@@ -5,8 +5,6 @@
 
 #include "kmeans_wrapper.h"
 
-#define N_EXEC 10
-
 static int parse_intarg(char const *arg)
 {
     int res = 0;
@@ -37,7 +35,9 @@ int main(int argc, char **argv)
     int const clusters_max = parse_intarg(argv[5]);
     int const clusters_step = parse_intarg(argv[6]);
 
-    std::string csvdir(argv[7]);
+    int const n_exec = parse_intarg(argv[7]);
+
+    std::string csvdir(argv[8]);
     if (csvdir.back() != '/')
         csvdir += '/';
 
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
             cv::randu(image, cv::Scalar(0, 0, 0), cv::Scalar(255, 255, 255));
 
             for (int c = clusters_min; c <= clusters_max; c += clusters_step) {
-                for (int i = 0; i <= N_EXEC; ++i) {
+                for (int i = 0; i <= n_exec; ++i) {
                     wrapper->exec(image, c);
                     double t = wrapper->get_exec_time();
                     os << dim << ',' << c << ',' << t << '\n';
