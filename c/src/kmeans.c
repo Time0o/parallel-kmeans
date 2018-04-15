@@ -58,7 +58,7 @@ void kmeans(struct pixel *pixels, size_t n_pixels,
     }
 
     // repeat for KMEANS_MAX_ITER or until solution is stationary
-    for (int iter = 0; iter < KMEANS_MAX_ITER - 1; ++iter) {
+    for (int iter = 0; iter < KMEANS_MAX_ITER; ++iter) {
         int done = 1;
 
         // reassign points to closest centroids
@@ -184,7 +184,7 @@ void kmeans_omp(struct pixel *pixels, size_t n_pixels,
     }
 
     // repeat for KMEANS_MAX_ITER or until solution is stationary
-    for (int iter = 0; iter < KMEANS_MAX_ITER - 1; ++iter) {
+    for (int iter = 0; iter < KMEANS_MAX_ITER; ++iter) {
         int done = 1;
 
         // reassign points to closest centroids
