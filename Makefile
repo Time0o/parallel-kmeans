@@ -11,11 +11,14 @@ CONFIG_DIR=config
 BUILD_DIR=build
 IMAGE_DIR=images
 
+CC_C=gcc
+CC_CPP=g++
+
 # files
 _CONFIG_DEPS=kmeans_config.h
 CONFIG_DEPS=$(patsubst %, $(CONFIG_DIR)/%, $(_CONFIG_DEPS))
 
-_C_DEPS=kmeans_c.h
+_C_DEPS=kmeans.h
 C_DEPS=$(patsubst %, $(C_INCLUDE_DIR)/%, $(_C_DEPS))
 
 _CPP_DEPS=kmeans_wrapper.h
@@ -23,7 +26,7 @@ CPP_DEPS=$(patsubst %, $(CPP_INCLUDE_DIR)/%, $(_CPP_DEPS))
 
 DEPS=$(CONFIG_DEPS) $(C_DEPS) $(CPP_DEPS)
 
-_C_OBJ=kmeans_c.o
+_C_OBJ=kmeans.o
 C_OBJ=$(patsubst %, $(C_OBJ_DIR)/%, $(_C_OBJ))
 
 _CPP_OBJ=kmeans_demo.o kmeans_wrapper.o
@@ -40,21 +43,21 @@ LFLAGS=`pkg-config --libs opencv` -fopenmp
 
 # demo parameters
 DEMO_CLUSTERS=3
-DEMO_IMAGE=stallman_small.jpg
+DEMO_IMAGE=demo_image.jpg
 
 # rules
 all: $(C_OBJ) $(CPP_OBJ)
 
 demo: all
-	g++ -o $(BUILD_DIR)/$@ $(C_OBJ) $(CPP_OBJ) $(LFLAGS)
+	$(CC_CPP) -o $(BUILD_DIR)/$@ $(C_OBJ) $(CPP_OBJ) $(LFLAGS)
 	@chmod +x $(BUILD_DIR)/$@
 	OMP_NUM_THREADS=4 ./$(BUILD_DIR)/$@ $(IMAGE_DIR)/$(DEMO_IMAGE) $(DEMO_CLUSTERS)
 
 $(C_OBJ_DIR)/%.o: $(C_SRC_DIR)/%.c $(C_DEPS) $(CONFIG_DEPS)
-	gcc -c -o $@ $< $(C_CFLAGS)
+	$(CC_C) -c -o $@ $< $(C_CFLAGS)
 
 $(CPP_OBJ_DIR)/%.o: $(CPP_SRC_DIR)/%.cc $(DEPS)
-	g++ -c -o $@ $< $(CPP_CFLAGS)
+	$(CC_CPP) -c -o $@ $< $(CPP_CFLAGS)
 
 .PHONY: clean
 clean:
