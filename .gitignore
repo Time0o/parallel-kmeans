@@ -10,3 +10,4 @@ report/aux/*
 !report/aux/.gitkeep
 report/pdf/*
 !report/pdf/.gitkeep
+svg-inkscape/
