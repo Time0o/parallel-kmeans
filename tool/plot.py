@@ -81,6 +81,7 @@ def plot_benchmarks(benchmarks):
             extent = ax.get_window_extent()
             extent = extent.transformed(plt.gcf().dpi_scale_trans.inverted())
             plt.savefig('report/resources/{}_boxplot.svg'.format(name),
+            plt.savefig('report/resources/{}_boxplot.png'.format(name),
                         bbox_inches=extent.expanded(1.5, 1.8))
 
     # display all plots
