@@ -50,7 +50,7 @@ define run_pdflatex
 endef
 
 # demo parameters
-DEMO_CLUSTERS=3
+DEMO_CLUSTERS=5
 DEMO_IMAGE=demo_image.jpg
 
 # rules
