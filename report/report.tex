@@ -229,14 +229,15 @@ linebackgroundcolor={%
     \ifnum\value{lstnumber}=122\color{yellow}\fi
     \ifnum\value{lstnumber}=124\color{yellow}\fi}]{../c/src/kmeans.c}
 
-Hier können die Berechnungen für jeden Pixel unabhängig voneinander erfolgen, es
-muss lediglich der Zugriff auf die gemeinsamen Variable \texttt{done},
-\texttt{sums} und \texttt{counts} synchronisiert werden. Für erstere genügt eine
-\texttt{\#pragma atomic write} Direktive, für die beiden Arrays kann die
-\texttt{reduction} Klausel (seit OpenMP Version 4.5 auf Arrays anwendbar)
-genutzt werden. Hierbei muss dann allerdings auch \texttt{sums} in ein Array
-von Fließkommazahlen umgewandelt werden (jeweils drei aufeinander folgende
-ersetzen ein \texttt{struct pixel}) um die Reduktion zu ermöglichen.
+Hier können die Berechnungen für jeden Pixel unabhängig voneinander erfolgen,
+es muss lediglich der Zugriff auf die gemeinsamen Variable \texttt{done},
+\texttt{sums} und \texttt{counts} synchronisiert werden. Für erstere genügt
+eine \texttt{\#pragma atomic write} Direktive, für die beiden Arrays kann die
+\texttt{reduction} Klausel \footnote{Seit OpenMP Version 4.5 (z.B. von GCC ab
+Version 6.1 unterstützt) auf Arrays anwendbar.} genutzt werden. Hierbei muss
+dann allerdings auch \texttt{sums} in ein Array von Fließkommazahlen
+umgewandelt werden (jeweils drei aufeinander folgende ersetzen ein
+\texttt{struct pixel}) um die Reduktion zu ermöglichen.
 
 Andere Abschnitte des Algorithmus können potentiell ebenfall parallelisiert
 werden, allerdings mit vergleichbar kleinem Performance-Gewinn. Bei der
