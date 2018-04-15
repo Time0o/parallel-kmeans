@@ -252,6 +252,36 @@ nicht.
 
 \section{CUDA}
 
+\chapter{Nutzung des Repositorys}
+
+\section{Demo}
+
+Wird aus dem Wurzelverzeichnis des Repositorys \texttt{make demo} ausgeführt,
+werden die verschiedenen Implementierungen auf das Beispiel-Bild
+\texttt{images/demo\_image.jpg} angewandt und die Ergebnisse dargestellt. Da
+die initialen Partitions-Schwerpunkte zufällig gewählt werden kann es unter
+Umständen vorkommen, dass die Ergebnisse leicht unterschiedlich ausfallen
+(auch in Abhängigkeit der maximalen Anzahl von Iterationen).
+Abbildung~\ref{img:demoresults} zeigt ein Beispiel
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{report/resources/demo_results.jpg}
+\caption{Beispielhafte Demo Ergebnisse}
+\label{img:demoresults}
+\end{figure}
+
+\section{Benchmark}
+
+Bei Ausführung von \texttt{make benchmark} werden die Implementierungen
+hingegen entsprechend der im \texttt{Makefile} gesetzten Parameter auf zufällig
+generierte Bilder verschiedener Größen mit variierenden Partitions-Größen
+angewandt und jeweils die Ausführungszeiten in \texttt{.csv} Datein im
+\texttt{benchmarks} Verzeichnis protokolliert. Mit dem Python script
+\texttt{tool/plot} können die Ergbenisse visualisiert werden, dazu muss
+\texttt{./tool/plot benchmarks} ausgerufen werden (passiert bei Ausführung von
+\texttt{make benchmark} automatisch).
+
 \chapter{Quellcode}
 
 \begin{thebibliography}{1}

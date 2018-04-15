@@ -90,6 +90,7 @@ int main(int argc, char **argv)
     std::string disp_title(argv[1]);
     cv::namedWindow(disp_title, cv::WINDOW_AUTOSIZE);
     cv::imshow(disp_title, win_mat);
+    cv::imwrite("report/resources/demo_results.jpg", win_mat);
     try {
         cv::waitKey(0);
         cv::destroyWindow(disp_title);
