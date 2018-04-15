@@ -152,7 +152,7 @@ Funktion weist zu diesem Zweck jedem Pixel \texttt{pixels[i]} in
 und ist wie in Quelltext~\ref{lst:structpixel} gezeigt definiert.
 
 \lstinputlisting[language=C, firstline=4, lastline=7,
-caption={\texttt{struct pixel}}, label=lst:structpixel]{../c/include/kmeans.h}
+caption={\texttt{struct pixel}}, label=lst:structpixel]{../../c/include/kmeans.h}
 
 Will man die Funktion nutzen um ein Farbbild zu segmentieren, muss man also
 zunächst die Pixel des Bildes in ein eindimensionales Array vom Typ
@@ -181,7 +181,7 @@ TODO: profiling
 
 \lstinputlisting[language=C, firstline=10, lastline=163,
 caption={Iterative k-means Implementierung in C},
-label=lst:kmeansc]{../c/src/kmeans.c}
+label=lst:kmeansc]{../../c/src/kmeans.c}
 
 \chapter{Parallelisierung}
 \section{OpenMP}
@@ -227,7 +227,7 @@ linebackgroundcolor={%
     \ifnum\value{lstnumber}=120\color{yellow}\fi
     \ifnum\value{lstnumber}=121\color{yellow}\fi
     \ifnum\value{lstnumber}=122\color{yellow}\fi
-    \ifnum\value{lstnumber}=124\color{yellow}\fi}]{../c/src/kmeans.c}
+    \ifnum\value{lstnumber}=124\color{yellow}\fi}]{../../c/src/kmeans.c}
 
 Hier können die Berechnungen für jeden Pixel unabhängig voneinander erfolgen,
 es muss lediglich der Zugriff auf die gemeinsamen Variable \texttt{done},
