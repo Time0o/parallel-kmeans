@@ -12,10 +12,12 @@
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
 \usepackage{pxfonts}
+\usepackage{subcaption}
 \usepackage[dvipsnames]{xcolor}
 
 % import after xcolor to avoid clash
 \usepackage{lstlinebgrd}
+\usepackage{svg}
 
 \lstset{
     basicstyle=\scriptsize,
@@ -186,7 +188,11 @@ caption={Iterative k-means Implementierung in C},
 label=lst:kmeansc]{../../c/src/kmeans.c}
 
 \chapter{Parallelisierung}
+
 \section{OpenMP}
+
+\subsection{Implementierung}
+
 Quelltext~\ref{lst:kmeansomp} zeigt die mittels OpenMP parallelisierte Variante
 der in Quelltext~\ref{lst:kmeansc} gezeigten C-Implementierung. Modifizierte
 Zeilen sind farbig hervorgehoben. Es mussten nur einige wenige Änderungen
@@ -198,6 +204,24 @@ maximale Ausnutzung der dem Algortihmus inhärenten Parallelisierbarkeit eine
 geeignete Code-Struktur vorliegen, dies ist hier aber prinzipiell bereits
 gegeben, da die Performance-kritische Schleife in Zeilen 56-78 in
 Quelltext~\ref{lst:kmeansc} bereits in geigneter Form gegeben ist.
+Hier können die Berechnungen für jeden Pixel unabhängig voneinander erfolgen,
+es muss lediglich der Zugriff auf die gemeinsamen Variable \texttt{done},
+\texttt{sums} und \texttt{counts} synchronisiert werden. Für erstere genügt
+eine \texttt{\#pragma atomic write} Direktive, für die beiden Arrays kann die
+\texttt{reduction} Klausel \footnote{Seit OpenMP Version 4.5 (z.B. von GCC ab
+Version 6.1 unterstützt) auf Arrays anwendbar.} genutzt werden. Hierbei muss
+dann allerdings auch \texttt{sums} in ein Array von Fließkommazahlen
+umgewandelt werden (jeweils drei aufeinander folgende ersetzen ein
+\texttt{struct pixel}) um die Reduktion zu ermöglichen.
+
+Andere Abschnitte des Algorithmus können potentiell ebenfall parallelisiert
+werden, allerdings mit vergleichbar kleinem Performance-Gewinn. Bei der
+Reparatur leerer Partitionen wurde ebenfalls über die einzelnen Pixel
+parallelisiert, dieser Codeabschnitt wird jedoch nur selten (wenn überhaupt)
+aufgerufen. Eine Parallelisierung über die Schwerpunkte (z.B. in Zeilen 134-148
+in Quellcode~\ref{lst:kmeansc} lohnt sich aufgrund der in realistischen
+Anwendungsfällen im Vergleich zur Anzahl der Pixel kleinen Zahl der Partitionen
+nicht.
 
 \lstinputlisting[language=C, firstline=165, lastline=296,
 caption={Parallilisierte k-means Implementierung mit OpenMP},
@@ -231,24 +255,34 @@ linebackgroundcolor={%
     \ifnum\value{lstnumber}=122\color{yellow}\fi
     \ifnum\value{lstnumber}=124\color{yellow}\fi}]{../../c/src/kmeans.c}
 
-Hier können die Berechnungen für jeden Pixel unabhängig voneinander erfolgen,
-es muss lediglich der Zugriff auf die gemeinsamen Variable \texttt{done},
-\texttt{sums} und \texttt{counts} synchronisiert werden. Für erstere genügt
-eine \texttt{\#pragma atomic write} Direktive, für die beiden Arrays kann die
-\texttt{reduction} Klausel \footnote{Seit OpenMP Version 4.5 (z.B. von GCC ab
-Version 6.1 unterstützt) auf Arrays anwendbar.} genutzt werden. Hierbei muss
-dann allerdings auch \texttt{sums} in ein Array von Fließkommazahlen
-umgewandelt werden (jeweils drei aufeinander folgende ersetzen ein
-\texttt{struct pixel}) um die Reduktion zu ermöglichen.
+\subsection{Performance}
 
-Andere Abschnitte des Algorithmus können potentiell ebenfall parallelisiert
-werden, allerdings mit vergleichbar kleinem Performance-Gewinn. Bei der
-Reparatur leerer Partitionen wurde ebenfalls über die einzelnen Pixel
-parallelisiert, dieser Codeabschnitt wird jedoch nur selten (wenn überhaupt)
-aufgerufen. Eine Parallelisierung über die Schwerpunkte (z.B. in Zeilen 134-148
-in Quellcode~\ref{lst:kmeansc} lohnt sich aufgrund der in realistischen
-Anwendungsfällen im Vergleich zur Anzahl der Pixel kleinen Zahl der Partitionen
-nicht.
+Abbildung~\ref{img:copenmpboxplot} visualisiert die Ausführungszeiten des
+seriellen sowie des mit OpenMP parallelisierten k-means Algorithmus. Für alle
+auf der horizontalen Achse abgetragenen Bild-Dimensionen wurden beide
+Implementierungen auf je 100 verschiedene, zufällig generierte Bilder
+angewandt. Die Boxplots lassen erkennen, in welchem Bereich sich die
+Ausführungszeiten jeweils befinden und wie groß ihre Streuung ist. Die
+gestrichtelte Linie verläuft durch die durchschnittlichen Ausführungszeiten und
+zeigt wie zu erwarten in beiden Fällen eine lineare Abhängigkeit der
+Ausführungszeit von der Anzahl der Pixel auf.
+
+Abbildung~\ref{copenmpspeedup} zeigt für dieselben Bild-Dimensionen jeweils den
+durchschnittlichen durch die Nutzung von OpenMP erreichten Speedup.
+
+\begin{figure}[h]
+\centering
+\includesvg[width=\textwidth]{report/resources/C_OpenMP_boxplots}
+\caption{Performance-Vergleich C vs. C + OpenMP}
+\label{img:copenmpboxplot}
+\end{figure}
+
+\begin{figure}[h]
+\centering
+\includesvg[width=\textwidth]{report/resources/C_OpenMP_speedup}
+\caption{Speedup C vs. C + OpenMP}
+\label{img:copenmpspeedup}
+\end{figure}
 
 \section{CUDA}
 

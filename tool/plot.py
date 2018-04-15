@@ -7,7 +7,7 @@ import sys
 
 import matplotlib.pyplot as plt
 
-def plot_benchmarks(benchmarks):
+def parse_benchmarks(benchmarks):
     results = {}
 
     # parse .csv data
@@ -29,64 +29,101 @@ def plot_benchmarks(benchmarks):
             else:
                 results[name][n_clusters][dim].append(time)
 
-    it = iter(sorted(results))
+    return results
 
-    subplot_dim = math.ceil(math.sqrt(len(results)))
-    for y in range(subplot_dim):
-        for x in range(subplot_dim):
-            p = y * subplot_dim + x + 1
-            if p == len(results) + 1:
-                break
+def plot_comparison(name1, data1, name2, data2):
+    # determine median cluster size
+    n_clusters1 = sorted(data1)[len(data1) // 2]
+    n_clusters2 = sorted(data2)[len(data2) // 2]
+    if n_clusters1 != n_clusters2:
+        raise ValueError("incompatible data")
 
-            # generate boxplots for median cluster size
-            ax = plt.subplot(subplot_dim, subplot_dim, p)
-            name = next(it)
-            tmp = sorted(results[name])
-            n_clusters = tmp[len(tmp) // 2]
+    # prepare data
+    dims = []
+    times = ([], [])
+    for dim1, dim2 in zip(data1[n_clusters1], data2[n_clusters2]):
+        if dim1 != dim2:
+            raise ValueError("incompatible data")
 
-            dims = []
-            times = []
-            for dim in results[name][n_clusters]:
-                dims.append(dim)
-                times.append(results[name][n_clusters][dim])
+        dims.append(dim1)
+        times[0].append(data1[n_clusters1][dim1])
+        times[1].append(data2[n_clusters2][dim2])
 
-            # plot results
-            bplot = ax.boxplot(times, patch_artist=True)
+    # common plot settings
+    plt.rc('text', usetex=True)
+    labelsize = 20
+    labelpad = 20
 
-            elems = ['boxes', 'whiskers', 'fliers', 'means', 'medians', 'caps']
-            for elem in elems:
-                plt.setp(bplot[elem], color='lightslategray')
+    l = lambda x : r'${d} \times {d}$'.format(d=int(x))
+    xticklabels = list(map(l, dims))
 
-            plt.setp(bplot['boxes'], facecolor='lightsteelblue')
-            plt.setp(bplot['fliers'],
-                     markerfacecolor='lightsteelblue',
-                     markeredgecolor='lightslategray')
+    # create boxplots
+    fig, (ax1, ax2) = plt.subplots(1, 2)
 
-            ax.plot(range(1, len(dims) + 1),
-                    [sum(t) / len(t) for t in times],
-                    color='gray', linestyle='--')
+    def bplot(ax, name, n_clusters, dims, times):
+        bplot = ax.boxplot(times, patch_artist=True)
 
-            ax.set_title('{} ({} Clusters)'.format(name, n_clusters))
-            ax.set_xlabel(r'$\frac{A_{image}}{pixels^2}$', size=15, labelpad=20)
-            ax.set_ylabel(r'$\frac{t_{exec}}{\mu s}$', size=15, labelpad=20,
-                          rotation=0)
+        elems = ['boxes', 'whiskers', 'fliers', 'means', 'medians', 'caps']
+        for elem in elems:
+            plt.setp(bplot[elem], color='lightslategray')
 
-            ax.set_xticklabels(
-                map(lambda x : '{d}x{d}'.format(d=int(x)), dims),
-                rotation=-45, ha='left')
+        plt.setp(bplot['boxes'], facecolor='lightsteelblue')
+        plt.setp(bplot['fliers'],
+                 markerfacecolor='lightsteelblue',
+                 markeredgecolor='lightslategray')
 
-            ax.grid(True)
+        ax.plot(range(1, len(dims) + 1),
+                [sum(t) / len(t) for t in times],
+                color='gray', linestyle='--')
 
-            # save plot to file
-            extent = ax.get_window_extent()
-            extent = extent.transformed(plt.gcf().dpi_scale_trans.inverted())
-            plt.savefig('report/resources/{}_boxplot.svg'.format(name),
-            plt.savefig('report/resources/{}_boxplot.png'.format(name),
-                        bbox_inches=extent.expanded(1.5, 1.8))
+        ax.set_title('{} ({} Clusters)'.format(name, n_clusters))
 
-    # display all plots
-    plt.tight_layout()
-    plt.show()
+        xlabel = r'$\frac{A_{image}}{pixels^2}$'
+        ax.set_xlabel(xlabel, size=labelsize)
+
+        ylabel = r'$\frac{t_{exec}}{\mu s}$'
+        ax.set_ylabel(ylabel, size=labelsize, labelpad=labelpad, rotation=0)
+        ax.yaxis.set_label_coords(0.0, 1.02)
+
+        ax.set_xticklabels(xticklabels, rotation=-45, ha='left')
+
+        ax.grid(True)
+
+    bplot(ax1, name1, n_clusters1, dims, times[0])
+    bplot(ax2, name2, n_clusters2, dims, times[1])
+
+    # save plots to file
+    fig.set_size_inches(10, 5)
+
+    fname = 'report/resources/{}_{}_boxplots.svg'.format(name1, name2)
+    plt.savefig(fname)
+
+    fig.clear()
+
+    # create speedup plot
+    speedups = []
+    for times1, times2 in zip(times[0], times[1]):
+        avg1 = sum(times1) / len(times1)
+        avg2 = sum(times2) / len(times2)
+        speedups.append(avg1 / avg2)
+
+    plt.plot(dims, speedups, 'o')
+    plt.axhline(y=(sum(speedups) / len(speedups)), linestyle='--')
+
+    plt.title('Speedup {} vs. {}'.format(name2, name1))
+    plt.xlabel(r'$\frac{A_{image}}{pixels^2}$', size=labelsize)
+
+    plt.xticks(dims, xticklabels, rotation=-45, ha='left')
+
+    plt.grid(True)
+
+    # save plots to file
+    fig.set_size_inches(10, 5)
+
+    fname = 'report/resources/{}_{}_speedup.svg'.format(name1, name2)
+    plt.savefig(fname)
+
+    fig.clear()
 
 if __name__ == '__main__':
     benchmarks = []
@@ -108,5 +145,6 @@ if __name__ == '__main__':
 
                 benchmarks.append((benchmark_name, benchmark_data))
 
-    # plot data
-    plot_benchmarks(benchmarks)
+    # create plots
+    results = parse_benchmarks(benchmarks)
+    plot_comparison("C", results['C'], "OpenMP", results['OpenMP'])
