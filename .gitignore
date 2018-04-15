@@ -5,4 +5,6 @@ c/obj/*
 cpp/obj/*
 !cpp/obj/.gitkeep
 report/aux/*
+!report/aux/.gitkeep
 report/pdf/*
+!report/pdf/.gitkeep
