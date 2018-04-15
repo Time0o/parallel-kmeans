@@ -44,6 +44,12 @@ int main(int argc, char **argv)
     KmeansOpenCVWrapper opencv_wrapper;
     wrappers.push_back(std::make_pair("OpenCV", &opencv_wrapper));
 
+    KmeansPureCWrapper pure_c_wrapper;
+    wrappers.push_back(std::make_pair("C", &pure_c_wrapper));
+
+    KmeansOMPWrapper omp_wrapper;
+    wrappers.push_back(std::make_pair("OpenMP", &omp_wrapper));
+
     for (size_t i = 0u; i < wrappers.size(); ++i) {
         std::string &name = std::get<0>(wrappers[i]);
         KmeansWrapper *wrapper = std::get<1>(wrappers[i]);
