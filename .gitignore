@@ -1,3 +1,5 @@
+benchmarks/*
+!benchmarks/.gitkeep
 build/*
 !build/.gitkeep
 c/obj/*

@@ -30,7 +30,7 @@ DEPS=$(CONFIG_DEPS) $(C_DEPS) $(CPP_DEPS)
 _C_OBJ=kmeans.o
 C_OBJ=$(patsubst %, $(C_OBJ_DIR)/%, $(_C_OBJ))
 
-_CPP_OBJ=kmeans_demo.o kmeans_wrapper.o
+_CPP_OBJ=kmeans_wrapper.o
 CPP_OBJ=$(patsubst %, $(CPP_OBJ_DIR)/%, $(_CPP_OBJ))
 
 # compilation settings
@@ -49,17 +49,37 @@ define run_pdflatex
 	pdflatex -halt-on-error -output-directory $(REPORT_AUX_DIR) $< > /dev/null
 endef
 
+# benchmark parameters
+BENCHMARK_DIM_MIN=100
+BENCHMARK_DIM_MAX=500
+BENCHMARK_DIM_STEP=100
+
+BENCHMARK_CLUSTER_MIN=2
+BENCHMARK_CLUSTER_MAX=20
+BENCHMARK_CLUSTER_STEP=18
+
+BENCHMARK_OUTDIR=benchmarks
+
+BENCHMARK_PLOT=tool/plot.py
+
 # demo parameters
 DEMO_CLUSTERS=5
 DEMO_IMAGE=demo_image.jpg
 
 # rules
-all: $(C_OBJ) $(CPP_OBJ)
-
-demo: all
-	$(CC_CPP) -o $(BUILD_DIR)/$@ $(C_OBJ) $(CPP_OBJ) $(LFLAGS)
+demo: $(CPP_OBJ_DIR)/kmeans_demo.o $(C_OBJ) $(CPP_OBJ)
+	$(CC_CPP) -o $(BUILD_DIR)/$@ $^ $(LFLAGS)
 	@chmod +x $(BUILD_DIR)/$@
-	OMP_NUM_THREADS=4 ./$(BUILD_DIR)/$@ $(IMAGE_DIR)/$(DEMO_IMAGE) $(DEMO_CLUSTERS)
+	./$(BUILD_DIR)/$@ $(IMAGE_DIR)/$(DEMO_IMAGE) $(DEMO_CLUSTERS)
+
+benchmark: $(CPP_OBJ_DIR)/kmeans_benchmark.o $(C_OBJ) $(CPP_OBJ)
+	$(CC_CPP) -o $(BUILD_DIR)/$@ $^ $(LFLAGS)
+	@chmod +x $(BUILD_DIR)/$@
+	./$(BUILD_DIR)/$@ \
+	$(BENCHMARK_DIM_MIN) $(BENCHMARK_DIM_MAX) $(BENCHMARK_DIM_STEP) \
+	$(BENCHMARK_CLUSTER_MIN) $(BENCHMARK_CLUSTER_MAX) $(BENCHMARK_CLUSTER_STEP) \
+	$(BENCHMARK_OUTDIR)
+	./$(BENCHMARK_PLOT) $(BENCHMARK_OUTDIR)
 
 report: $(REPORT_TEX_DIR)/report.tex
 	$(call run_pdflatex)
