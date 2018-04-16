@@ -8,9 +8,11 @@
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{babel}
+\usepackage{caption}
+\usepackage{chngcntr}
 \usepackage{hyperref}
 \usepackage[utf8]{inputenc}
-\usepackage{listings}
+\usepackage{minted}
 \usepackage{pxfonts}
 \usepackage{subcaption}
 \usepackage[dvipsnames]{xcolor}
@@ -19,17 +21,15 @@
 \usepackage{lstlinebgrd}
 \usepackage{svg}
 
-\lstset{
-    basicstyle=\scriptsize,
-    commentstyle=\color{Green}\bfseries,
-    frame=single,
-    framexleftmargin=3em,
-    keywordstyle=\color{RoyalBlue}\bfseries,
-    numbers=left,
-    otherkeywords={size\_t, \#, \\, pragma, omp, parallel,
-                   reduction, atomic, write, critical},
-    xleftmargin=3em,
+% listing settings
+\setminted{
+  frame=single,
+  fontsize=\scriptsize,
+  labelposition=none,
+  linenos,
 }
+
+\counterwithin{listing}{chapter}
 
 \begin{document}
 
@@ -144,19 +144,20 @@ Menge aller Pixel eines Bildes in \texttt{RGB}-Vektordarstellung und $F$ der
 
 \section{Sequentielle Implementierung}
 
-\subsubsection{Aufruf}
-
-Quelltext~\ref{lst:kmeansc} zeigt eine sequentielle Implementierung des k-means
+Listing~\ref{lst:kmeansc} zeigt eine sequentielle Implementierung des k-means
 Algorithmus in C. Die Funktion \texttt{kmeans} in Zeile 30 zerlegt die in
 \texttt{n\_pixels} in \texttt{pixels} gespeicherten Pixel in
 \texttt{n\_centroids} Partitionen mit den Schwerpunkten \texttt{centroids}. Die
 Funktion weist zu diesem Zweck jedem Pixel \texttt{pixels[i]} in
 \texttt{labels[i]} den Index der Partition zu der dieser Pixel gehört zu.
 \texttt{struct pixel} repräsentiert dabei einen Punkt im \texttt{RGB}-Farbraum
-und ist wie in Quelltext~\ref{lst:structpixel} gezeigt definiert.
+und ist wie in Listing~\ref{lst:structpixel} gezeigt definiert.
 
-\lstinputlisting[language=C, firstline=4, lastline=7,
-caption={\texttt{struct pixel}}, label=lst:structpixel]{../../c/include/kmeans.h}
+\captionof{listing}{Sequentielle k-means Implementierung in C\label{lst:kmeansc}}
+\inputminted[lastline=163, label=kmeansc]{C}{c/src/kmeans.c}
+
+\captionof{listing}{struct pixel\label{lst:structpixel}}
+\inputminted[firstline=4, lastline=7]{C}{c/include/kmeans.h}
 
 Will man die Funktion nutzen um ein Farbbild zu segmentieren, muss man also
 zunächst die Pixel des Bildes in ein eindimensionales Array vom Typ
@@ -165,8 +166,6 @@ zunächst die Pixel des Bildes in ein eindimensionales Array vom Typ
 \texttt{centroids[labels[i]]} gespeicherten Schwerpunkt der Partitionen der er
 zugeteilt wurde ersetzt und anschließend das zweidimensionale Bild
 rekonstruiert werden.
-
-\subsubsection{Ablauf}
 
 In den Zeilen 42-49 findet die zufällige Initialisierung der
 Partitions-Schwerpunkte statt. Die Hauptschleife in den Zeilen 52-153 iteriert
@@ -183,18 +182,14 @@ In Zeilen 134-148 werden die neuen Schwerpunkte über die in \texttt{sums} und
 
 TODO: profiling
 
-\lstinputlisting[language=C, firstline=10, lastline=163,
-caption={Iterative k-means Implementierung in C},
-label=lst:kmeansc]{../../c/src/kmeans.c}
-
 \chapter{Parallelisierung}
 
 \section{OpenMP}
 
 \subsection{Implementierung}
 
-Quelltext~\ref{lst:kmeansomp} zeigt die mittels OpenMP parallelisierte Variante
-der in Quelltext~\ref{lst:kmeansc} gezeigten C-Implementierung. Modifizierte
+Listing~\ref{lst:kmeansomp} zeigt die mittels OpenMP parallelisierte Variante
+der in Listing~\ref{lst:kmeansc} gezeigten C-Implementierung. Modifizierte
 Zeilen sind farbig hervorgehoben. Es mussten nur einige wenige Änderungen
 vorgenommen werden um eine performante Parallelisierung zu erreichen, hier
 zeigt sich eine große Stärke von OpenMP: existierender Code kann teilweise
@@ -203,7 +198,7 @@ zeigt sich eine große Stärke von OpenMP: existierender Code kann teilweise
 maximale Ausnutzung der dem Algortihmus inhärenten Parallelisierbarkeit eine
 geeignete Code-Struktur vorliegen, dies ist hier aber prinzipiell bereits
 gegeben, da die Performance-kritische Schleife in Zeilen 56-78 in
-Quelltext~\ref{lst:kmeansc} bereits in geigneter Form gegeben ist.
+Listing~\ref{lst:kmeansc} bereits in geigneter Form gegeben ist.
 Hier können die Berechnungen für jeden Pixel unabhängig voneinander erfolgen,
 es muss lediglich der Zugriff auf die gemeinsamen Variable \texttt{done},
 \texttt{sums} und \texttt{counts} synchronisiert werden. Für erstere genügt
@@ -223,37 +218,10 @@ in Quellcode~\ref{lst:kmeansc} lohnt sich aufgrund der in realistischen
 Anwendungsfällen im Vergleich zur Anzahl der Pixel kleinen Zahl der Partitionen
 nicht.
 
-\lstinputlisting[language=C, firstline=165, lastline=296,
-caption={Parallilisierte k-means Implementierung mit OpenMP},
-label=lst:kmeansomp,
-linebackgroundcolor={%
-    \ifnum\value{lstnumber}=9\color{yellow}\fi
-    \ifnum\value{lstnumber}=16\color{yellow}\fi
-    \ifnum\value{lstnumber}=17\color{yellow}\fi
-    \ifnum\value{lstnumber}=27\color{yellow}\fi
-    \ifnum\value{lstnumber}=28\color{yellow}\fi
-    \ifnum\value{lstnumber}=40\color{yellow}\fi
-    \ifnum\value{lstnumber}=45\color{yellow}\fi
-    \ifnum\value{lstnumber}=46\color{yellow}\fi
-    \ifnum\value{lstnumber}=47\color{yellow}\fi
-    \ifnum\value{lstnumber}=48\color{yellow}\fi
-    \ifnum\value{lstnumber}=77\color{yellow}\fi
-    \ifnum\value{lstnumber}=84\color{yellow}\fi
-    \ifnum\value{lstnumber}=85\color{yellow}\fi
-    \ifnum\value{lstnumber}=90\color{yellow}\fi
-    \ifnum\value{lstnumber}=99\color{yellow}\fi
-    \ifnum\value{lstnumber}=100\color{yellow}\fi
-    \ifnum\value{lstnumber}=101\color{yellow}\fi
-    \ifnum\value{lstnumber}=102\color{yellow}\fi
-    \ifnum\value{lstnumber}=104\color{yellow}\fi
-    \ifnum\value{lstnumber}=105\color{yellow}\fi
-    \ifnum\value{lstnumber}=106\color{yellow}\fi
-    \ifnum\value{lstnumber}=107\color{yellow}\fi
-    \ifnum\value{lstnumber}=117\color{yellow}\fi
-    \ifnum\value{lstnumber}=120\color{yellow}\fi
-    \ifnum\value{lstnumber}=121\color{yellow}\fi
-    \ifnum\value{lstnumber}=122\color{yellow}\fi
-    \ifnum\value{lstnumber}=124\color{yellow}\fi}]{../../c/src/kmeans.c}
+\captionof{listing}{Parallelisierte k-means Implementierung mit OpenMP\label{lst:kmeansomp}}
+\inputminted[firstline=165, label=kmeansomp, highlightlines={
+174, 180-181, 191-192, 204, 209-212, 241, 248-249, 254, 263-266, 268-271, 281,
+284-286, 288}]{C}{c/src/kmeans.c}
 
 \subsection{Performance}
 
@@ -318,10 +286,45 @@ angewandt und jeweils die Ausführungszeiten in \texttt{.csv} Datein im
 
 \chapter{Quellcode}
 
+Alle genutzten Quellcode- und Build-Dateien:
+
+\captionof{listing}{kmeans.h}
+\inputminted{C}{c/include/kmeans.h}
+
+\captionof{listing}{kmeans\_config.h}
+\inputminted{C}{config/kmeans_config.h}
+
+\captionof{listing}{kmeans.c}
+\inputminted{C}{c/src/kmeans.c}
+
+\captionof{listing}{kmeans\_wrapper.h}
+\inputminted{C}{cpp/include/kmeans_wrapper.h}
+
+\captionof{listing}{kmeans\_wrapper.cc}
+\inputminted{C}{cpp/src/kmeans_wrapper.cc}
+
+\captionof{listing}{kmeans\_benchmark.cc}
+\inputminted{C}{cpp/src/kmeans_benchmark.cc}
+
+\captionof{listing}{kmeans\_demo.cc}
+\inputminted{C}{cpp/src/kmeans_demo.cc}
+
+\captionof{listing}{Makefile}
+\inputminted{make}{Makefile}
+
 \begin{thebibliography}{1}
 \bibitem[1]{bib:lloyd}
 Lloyd., S. P. (1982). ``Least squares quantization in PCM''. IEEE Transactions
 on Information Theory
 \end{thebibliography}
+
+\renewcommand\listoflistingscaption{Quellcodeverzeichnis}
+\renewcommand{\listoflistings}{%
+  \cleardoublepage
+  \phantomsection
+  \addcontentsline{toc}{chapter}{\listoflistingscaption}%
+  \listof{listing}{\listoflistingscaption}%
+}
+\listoflistings
 
 \end{document}

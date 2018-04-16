@@ -1,3 +1,4 @@
+_minted-report/
 benchmarks/*
 !benchmarks/.gitkeep
 build/*
