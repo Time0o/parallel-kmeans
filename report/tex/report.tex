@@ -153,10 +153,13 @@ Funktion weist zu diesem Zweck jedem Pixel \texttt{pixels[i]} in
 \texttt{struct pixel} repräsentiert dabei einen Punkt im \texttt{RGB}-Farbraum
 und ist wie in Listing~\ref{lst:structpixel} gezeigt definiert.
 
-\captionof{listing}{Sequentielle k-means Implementierung in C\label{lst:kmeansc}}
+\captionof{listing}{%
+Sequentielle k-means Implementierung in C (Ausschnitt \texttt{kmeans.c})
+\label{lst:kmeansc}}
 \inputminted[lastline=163, label=kmeansc]{C}{c/src/kmeans.c}
 
-\captionof{listing}{struct pixel\label{lst:structpixel}}
+\captionof{listing}{struct pixel (Ausschnitt \texttt{kmeans.h})
+\label{lst:structpixel}}
 \inputminted[firstline=4, lastline=7]{C}{c/include/kmeans.h}
 
 Will man die Funktion nutzen um ein Farbbild zu segmentieren, muss man also
@@ -218,7 +221,8 @@ in Quellcode~\ref{lst:kmeansc} lohnt sich aufgrund der in realistischen
 Anwendungsfällen im Vergleich zur Anzahl der Pixel kleinen Zahl der Partitionen
 nicht.
 
-\captionof{listing}{Parallelisierte k-means Implementierung mit OpenMP\label{lst:kmeansomp}}
+\captionof{listing}{Parallelisierte k-means Implementierung mit OpenMP
+(Ausschnitt \texttt{kmeans.c})\label{lst:kmeansomp}}
 \inputminted[firstline=165, label=kmeansomp, highlightlines={
 174, 180-181, 191-192, 204, 209-212, 241, 248-249, 254, 263-266, 268-271, 281,
 284-286, 288}]{C}{c/src/kmeans.c}
@@ -297,28 +301,28 @@ angewandt und jeweils die Ausführungszeiten in \texttt{.csv} Datein im
 
 Alle genutzten Quellcode- und Build-Dateien:
 
-\captionof{listing}{kmeans.h}
+\captionof{listing}{\texttt{kmeans.h}}
 \inputminted{C}{c/include/kmeans.h}
 
-\captionof{listing}{kmeans\_config.h}
+\captionof{listing}{\texttt{kmeans\_config.h}}
 \inputminted{C}{config/kmeans_config.h}
 
-\captionof{listing}{kmeans.c}
+\captionof{listing}{\texttt{kmeans.c}}
 \inputminted{C}{c/src/kmeans.c}
 
-\captionof{listing}{kmeans\_wrapper.h}
+\captionof{listing}{\texttt{kmeans\_wrapper.h}}
 \inputminted{C}{cpp/include/kmeans_wrapper.h}
 
-\captionof{listing}{kmeans\_wrapper.cc}
+\captionof{listing}{\texttt{kmeans\_wrapper.cc}}
 \inputminted{C}{cpp/src/kmeans_wrapper.cc}
 
-\captionof{listing}{kmeans\_benchmark.cc}
+\captionof{listing}{\texttt{kmeans\_benchmark.cc}}
 \inputminted{C}{cpp/src/kmeans_benchmark.cc}
 
-\captionof{listing}{kmeans\_demo.cc}
+\captionof{listing}{\texttt{kmeans\_demo.cc}}
 \inputminted{C}{cpp/src/kmeans_demo.cc}
 
-\captionof{listing}{Makefile}
+\captionof{listing}{\texttt{Makefile}}
 \inputminted{make}{Makefile}
 
 \begin{thebibliography}{1}
