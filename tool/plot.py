@@ -7,6 +7,7 @@ import sys
 
 import matplotlib.pyplot as plt
 
+
 def parse_benchmarks(benchmarks):
     results = {}
 
@@ -31,109 +32,116 @@ def parse_benchmarks(benchmarks):
 
     return results
 
-def plot_comparison(name1, data1, name2, data2):
-    # determine median cluster size
-    n_clusters1 = sorted(data1)[len(data1) // 2]
-    n_clusters2 = sorted(data2)[len(data2) // 2]
-    if n_clusters1 != n_clusters2:
-        raise ValueError("incompatible data")
 
-    # prepare data
-    def parse_runtimes(runtimes):
-        dims = []
-        times = []
-        for dim in runtimes:
-            dims.append(dim)
-            times.append(runtimes[dim])
+def parse_runtimes(runtimes):
+    dims = []
+    times = []
+    for dim in runtimes:
+        dims.append(dim)
+        times.append(runtimes[dim])
 
-        times = [t for _, t in sorted(zip(dims, times))]
-        dims = sorted(dims)
+    times = [t for _, t in sorted(zip(dims, times))]
+    dims = sorted(dims)
 
-        return dims, times
+    return dims, times
 
-    dims1, times1 = parse_runtimes(data1[n_clusters1])
-    dims2, times2 = parse_runtimes(data2[n_clusters2])
 
-    if dims1 != dims2:
-        raise ValueError("incompatible data")
+def plot_speedup(title, dims, runtimes_ref, variant_runtimes):
+    rt_avgs_ref = []
+    for rt_ref in runtimes_ref:
+        rt_avgs_ref.append(sum(rt_ref) / len(rt_ref))
 
-    dims = dims1
+    colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
 
-    # common plot settings
-    plt.rc('text', usetex=True)
-    labelsize = 20
-    labelpad = 20
+    for i, (label, runtimes) in enumerate(variant_runtimes):
+        speedups = []
+        for j, rt in enumerate(runtimes):
+            speedups.append(rt_avgs_ref[j] / (sum(rt) / len(rt)))
 
-    l = lambda x : r'${d} \times {d}$'.format(d=int(x))
-    xticklabels = list(map(l, dims))
+        color = colors[i]
+        plt.plot(dims, speedups, 'x', label=label, color=color)
+        speedup_avg = sum(speedups) / len(speedups)
+        plt.axhline(y=speedup_avg, color=color, linestyle='--')
 
-    # create boxplots
-    fig, (ax1, ax2) = plt.subplots(1, 2)
+    xticklabels = map(lambda x : r'${d} \times {d}$'.format(d=int(x)), dims)
+    plt.xticks(dims, list(xticklabels), rotation=-45, ha='left')
+    plt.xlabel(r'$\frac{A_{image}}{pixels^2}$', size=15)
 
-    def bplot(ax, name, n_clusters, dims, times):
-        bplot = ax.boxplot(times, patch_artist=True)
+    plt.title(title)
+    plt.grid(True)
+    plt.legend()
 
+
+def boxplots(name_ref, dims_ref, runtimes_ref, name_variants, variant_runtimes):
+
+    def color_boxplot(bplot, facecolor, edgecolor):
         elems = ['boxes', 'whiskers', 'fliers', 'means', 'medians', 'caps']
         for elem in elems:
-            plt.setp(bplot[elem], color='lightslategray')
+            plt.setp(bplot_ref[elem], color=edgecolor)
 
-        plt.setp(bplot['boxes'], facecolor='lightsteelblue')
-        plt.setp(bplot['fliers'],
-                 markerfacecolor='lightsteelblue',
-                 markeredgecolor='lightslategray')
+        plt.setp(bplot_ref['boxes'], facecolor=facecolor)
+        plt.setp(bplot_ref['fliers'], markerfacecolor=facecolor)
+        plt.setp(bplot_ref['fliers'], markeredgecolor=edgecolor)
 
-        ax.plot(range(1, len(dims) + 1),
-                [sum(t) / len(t) for t in times],
-                color='gray', linestyle='--')
+    fig, (ax_ref, ax) = plt.subplots(1, 2)
 
-        ax.set_title('{} ({} Clusters)'.format(name, n_clusters))
+    # reference boxplots
+    bplot_ref = ax_ref.boxplot(runtimes_ref, patch_artist=True)
+    color_boxplot(bplot_ref, 'lightsteelblue', 'lightslategray')
 
-        xlabel = r'$\frac{A_{image}}{pixels^2}$'
-        ax.set_xlabel(xlabel, size=labelsize)
+    # reference center line
+    xticks = range(1, len(dims_ref) + 1)
+    runtime_avgs = [sum(t) / len(t) for t in runtimes_ref]
+    ax_ref.plot(xticks, runtime_avgs, color='gray', linestyle='--')
 
-        ylabel = r'$\frac{t_{exec}}{\mu s}$'
-        ax.set_ylabel(ylabel, size=labelsize, labelpad=labelpad, rotation=0)
-        ax.yaxis.set_label_coords(0.0, 1.02)
+    # reference formatting
+    xticklabels = map(lambda x : r'${d} \times {d}$'.format(d=int(x)), dims_ref)
+    ax_ref.set_xticklabels(xticklabels, rotation=-45, ha='left')
+    xlabel = r'$\frac{A_{image}}{pixels^2}$'
+    ax_ref.set_xlabel(xlabel, size=15)
 
-        ax.set_xticklabels(xticklabels, rotation=-45, ha='left')
+    ylabel = r'$\frac{t_{exec}}{\mu s}$'
+    ax_ref.set_ylabel(ylabel, size=15, rotation=0)
+    ax_ref.yaxis.set_label_coords(0.0, 1.02)
 
-        ax.grid(True)
+    ax_ref.set_title(name_ref)
+    ax_ref.grid(True)
 
-    bplot(ax1, name1, n_clusters1, dims, times1)
-    bplot(ax2, name2, n_clusters2, dims, times2)
+    # TODO
 
-    # save plots to file
-    fig.set_size_inches(10, 5)
 
-    fname = 'report/resources/{}_{}_boxplots.svg'.format(name1, name2)
+def plot_comparisons(name_ref, data_ref, name_variants, variants):
+    # determine median cluster size
+    n_clusters = sorted(data_ref)[len(data_ref) // 2]
+
+    # parse runtime data
+    dims_ref, runtimes_ref = parse_runtimes(data_ref[n_clusters])
+
+    variant_runtimes = []
+    for label, data in variants:
+        dims, runtimes = parse_runtimes(data[n_clusters])
+        if dims != dims_ref:
+            raise ValueError("incompatible data")
+
+        variant_runtimes.append((label, runtimes))
+
+    # create boxplots
+    boxplots(name_ref, dims_ref, runtimes_ref, name_variants, variant_runtimes)
+
+    # save plots
+    fname = 'report/resources/{}_{}_boxplots.svg'.format(name_ref, name_variants)
     plt.savefig(fname)
-
-    fig.clear()
+    plt.gcf().clear()
 
     # create speedup plot
-    speedups = []
-    for t1, t2 in zip(times1, times2):
-        avg1 = sum(t1) / len(t1)
-        avg2 = sum(t2) / len(t2)
-        speedups.append(avg1 / avg2)
+    title = 'Speedup {} vs. {}'.format(name_ref, name_variants)
+    plot_speedup(title, dims_ref, runtimes_ref, variant_runtimes)
 
-    plt.plot(dims, speedups, 'o')
-    plt.axhline(y=(sum(speedups) / len(speedups)), linestyle='--')
-
-    plt.title('Speedup {} vs. {}'.format(name2, name1))
-    plt.xlabel(r'$\frac{A_{image}}{pixels^2}$', size=labelsize)
-
-    plt.xticks(dims, xticklabels, rotation=-45, ha='left')
-
-    plt.grid(True)
-
-    # save plots to file
-    fig.set_size_inches(10, 5)
-
-    fname = 'report/resources/{}_{}_speedup.svg'.format(name1, name2)
+    # save plot
+    fname = 'report/resources/{}_{}_speedup.svg'.format(name_ref, name_variants)
     plt.savefig(fname)
+    plt.gcf().clear()
 
-    fig.clear()
 
 if __name__ == '__main__':
     benchmarks = []
@@ -157,4 +165,10 @@ if __name__ == '__main__':
 
     # create plots
     results = parse_benchmarks(benchmarks)
-    plot_comparison("C", results['C'], "OpenMP", results['OpenMP_double'])
+
+    omp = []
+    omp.append(("1 core", results["OpenMP_single"]))
+    omp.append(("2 cores", results["OpenMP_double"]))
+    omp.append(("3 cores", results["OpenMP_triple"]))
+    omp.append(("4 cores", results["OpenMP_quad"]))
+    plot_comparisons("C", results['C'], "OpenMP", omp)
