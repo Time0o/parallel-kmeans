@@ -39,15 +39,25 @@ def plot_comparison(name1, data1, name2, data2):
         raise ValueError("incompatible data")
 
     # prepare data
-    dims = []
-    times = ([], [])
-    for dim1, dim2 in zip(data1[n_clusters1], data2[n_clusters2]):
-        if dim1 != dim2:
-            raise ValueError("incompatible data")
+    def parse_runtimes(runtimes):
+        dims = []
+        times = []
+        for dim in runtimes:
+            dims.append(dim)
+            times.append(runtimes[dim])
 
-        dims.append(dim1)
-        times[0].append(data1[n_clusters1][dim1])
-        times[1].append(data2[n_clusters2][dim2])
+        times = [t for _, t in sorted(zip(dims, times))]
+        dims = sorted(dims)
+
+        return dims, times
+
+    dims1, times1 = parse_runtimes(data1[n_clusters1])
+    dims2, times2 = parse_runtimes(data2[n_clusters2])
+
+    if dims1 != dims2:
+        raise ValueError("incompatible data")
+
+    dims = dims1
 
     # common plot settings
     plt.rc('text', usetex=True)
@@ -89,8 +99,8 @@ def plot_comparison(name1, data1, name2, data2):
 
         ax.grid(True)
 
-    bplot(ax1, name1, n_clusters1, dims, times[0])
-    bplot(ax2, name2, n_clusters2, dims, times[1])
+    bplot(ax1, name1, n_clusters1, dims, times1)
+    bplot(ax2, name2, n_clusters2, dims, times2)
 
     # save plots to file
     fig.set_size_inches(10, 5)
@@ -102,9 +112,9 @@ def plot_comparison(name1, data1, name2, data2):
 
     # create speedup plot
     speedups = []
-    for times1, times2 in zip(times[0], times[1]):
-        avg1 = sum(times1) / len(times1)
-        avg2 = sum(times2) / len(times2)
+    for t1, t2 in zip(times1, times2):
+        avg1 = sum(t1) / len(t1)
+        avg2 = sum(t2) / len(t2)
         speedups.append(avg1 / avg2)
 
     plt.plot(dims, speedups, 'o')
@@ -147,4 +157,4 @@ if __name__ == '__main__':
 
     # create plots
     results = parse_benchmarks(benchmarks)
-    plot_comparison("C", results['C'], "OpenMP", results['OpenMP'])
+    plot_comparison("C", results['C'], "OpenMP", results['OpenMP_double'])
