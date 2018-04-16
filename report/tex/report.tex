@@ -228,7 +228,7 @@ nicht.
 Abbildung~\ref{img:copenmpboxplot} visualisiert die Ausführungszeiten des
 seriellen sowie des mit OpenMP parallelisierten k-means Algorithmus. Für alle
 auf der horizontalen Achse abgetragenen Bild-Dimensionen wurden beide
-Implementierungen auf je 100 verschiedene, zufällig generierte Bilder
+Implementierungen auf je 100 verschiedene, zufällig generierte Farbbilder
 angewandt. Die Programme wurden auf einer Maschine mit einem \texttt{Intel Core
 i5D-4690} Prozessor mit vier Prozessor-Kernen getestet. Die Boxplots lassen
 erkennen, in welchem Bereich sich die Ausführungszeiten jeweils befinden und
@@ -236,8 +236,16 @@ wie groß ihre Streuung ist. Die gestrichtelte Linie verläuft durch die
 durchschnittlichen Ausführungszeiten und zeigt wie zu erwarten in beiden Fällen
 eine lineare Abhängigkeit der Ausführungszeit von der Anzahl der Pixel auf.
 
-Abbildung~\ref{copenmpspeedup} zeigt für dieselben Bild-Dimensionen jeweils den
-durchschnittlichen durch die Nutzung von OpenMP erreichten Speedup.
+Abbildung~\ref{img:copenmpspeedup} zeigt für dieselben Bild-Dimensionen jeweils
+den durchschnittlichen durch die Nutzung von OpenMP erreichten Speedup.
+
+Es lässt sich erkennen, dass für angemessene Problemgrößen ein Speedup, der im
+Mittel ein wenig kleiner als die Zahl der zur Verfügung stehenden Prozessorkerne
+\footnote{Jeweils mittels \texttt{omp\_set\_num\_threads()} konfiguriert.} ist,
+erreicht werden konnte. Die Parallelisierung war somit erfolgreich.
+Gleichzeitig nimmt aber auch (wenn man von Ausreißern absieht) bei der Nutzung
+von mehreren Kernen die Schwankung der Ausführungszeiten deutlich stärker mit
+der Problemgröße zu.
 
 \begin{figure}[h]
 \centering
