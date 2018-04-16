@@ -1,3 +1,4 @@
+#include <omp.h>
 #include <opencv2/core/core.hpp>
 
 #include "kmeans_config.h"
@@ -28,6 +29,9 @@ void KmeansCWrapper::exec(cv::Mat const &image, size_t n_centroids) {
     std::vector<size_t> labels(n_pixels);
 
     // perform calculations
+    if (cores)
+        omp_set_num_threads(cores);
+
     start_timer();
     impl(&pixels[0], n_pixels, &centroids[0], n_centroids, &labels[0]);
     stop_timer();

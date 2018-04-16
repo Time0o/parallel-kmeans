@@ -48,8 +48,14 @@ int main(int argc, char **argv)
     KmeansPureCWrapper pure_c_wrapper;
     wrappers.push_back(std::make_pair("C", &pure_c_wrapper));
 
-    KmeansOMPWrapper omp_wrapper;
-    wrappers.push_back(std::make_pair("OpenMP", &omp_wrapper));
+    KmeansOMPWrapper omp_wrapper_single(1);
+    KmeansOMPWrapper omp_wrapper_double(2);
+    KmeansOMPWrapper omp_wrapper_triple(3);
+    KmeansOMPWrapper omp_wrapper_quad(4);
+    wrappers.push_back(std::make_pair("OpenMP_single", &omp_wrapper_single));
+    wrappers.push_back(std::make_pair("OpenMP_double", &omp_wrapper_double));
+    wrappers.push_back(std::make_pair("OpenMP_triple", &omp_wrapper_triple));
+    wrappers.push_back(std::make_pair("OpenMP_quad", &omp_wrapper_quad));
 
     for (size_t i = 0u; i < wrappers.size(); ++i) {
         std::string &name = std::get<0>(wrappers[i]);

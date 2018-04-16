@@ -38,19 +38,20 @@ class KmeansCWrapper : public KmeansWrapper
 {
 public:
     KmeansCWrapper(
-        void (*impl)(struct pixel *, size_t, struct pixel *, size_t, size_t *))
-            : impl(impl) {}
+        void (*impl)(struct pixel *, size_t, struct pixel *, size_t, size_t *),
+        int cores = 1) : impl(impl), cores(cores) {}
 
     void exec(cv::Mat const &image, size_t n_clusters);
 
 protected:
     void (*impl)(struct pixel *, size_t, struct pixel *, size_t, size_t *);
+    int cores;
 };
 
 class KmeansOMPWrapper : public KmeansCWrapper
 {
 public:
-    KmeansOMPWrapper() : KmeansCWrapper(kmeans_omp) {}
+    KmeansOMPWrapper(int cores = 4) : KmeansCWrapper(kmeans_omp, cores) {}
 };
 
 class KmeansPureCWrapper : public KmeansCWrapper
