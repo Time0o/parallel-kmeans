@@ -203,6 +203,9 @@ void kmeans_c(struct pixel *pixels, size_t n_pixels,
     printf("Kernel 3 (repairing empty clusters): %.3e\n", exec_time_kernel3);
     printf("Kernel 4 (average accumulated centroids): %.3e\n", exec_time_kernel4);
 #endif
+
+    free(sums);
+    free(counts);
 }
 
 void kmeans_omp(struct pixel *pixels, size_t n_pixels,
@@ -336,4 +339,7 @@ void kmeans_omp(struct pixel *pixels, size_t n_pixels,
         if (done)
             break;
     }
+
+    free(sums);
+    free(counts);
 }
