@@ -50,18 +50,18 @@ define run_pdflatex
 endef
 
 # benchmark parameters
+PROFILE_IMAGE=profile_image.jpg
+PROFILE_CLUSTERS=5
+
+# benchmark parameters
 BENCHMARK_DIM_MIN=10
 BENCHMARK_DIM_MAX=100
 BENCHMARK_DIM_STEP=10
-
 BENCHMARK_CLUSTER_MIN=10
 BENCHMARK_CLUSTER_MAX=10
 BENCHMARK_CLUSTER_STEP=1
-
 BENCHMARK_N_EXEC=100
-
 BENCHMARK_OUTDIR=benchmarks
-
 BENCHMARK_PLOT=tool/plot.py
 
 # demo parameters
@@ -73,6 +73,10 @@ demo: $(CPP_OBJ_DIR)/kmeans_demo.o $(C_OBJ) $(CPP_OBJ)
 	$(CC_CPP) -o $(BUILD_DIR)/$@ $^ $(LFLAGS)
 	@chmod +x $(BUILD_DIR)/$@
 	./$(BUILD_DIR)/$@ $(IMAGE_DIR)/$(DEMO_IMAGE) $(DEMO_CLUSTERS)
+
+profile: $(CPP_OBJ_DIR)/kmeans_profile.o $(C_OBJ_DIR)/kmeans_profile.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
+	$(CC_CPP) -o $(BUILD_DIR)/$@ $^ $(LFLAGS)
+	./$(BUILD_DIR)/$@ $(IMAGE_DIR)/$(PROFILE_IMAGE) $(PROFILE_CLUSTERS)
 
 benchmark: $(CPP_OBJ_DIR)/kmeans_benchmark.o $(C_OBJ) $(CPP_OBJ)
 	$(CC_CPP) -o $(BUILD_DIR)/$@ $^ $(LFLAGS)
@@ -87,6 +91,9 @@ report: $(REPORT_TEX_DIR)/report.tex
 	$(call run_pdflatex)
 	$(call run_pdflatex)
 	-@mv $(REPORT_AUX_DIR)/report.pdf $(REPORT_PDF_DIR)
+
+$(C_OBJ_DIR)/kmeans_profile.o: $(C_SRC_DIR)/kmeans.c $(C_DEPS) $(CONFIG_DEPS)
+	$(CC_C) -c -o $@ $< $(C_CFLAGS) -DPROFILE
 
 $(C_OBJ_DIR)/%.o: $(C_SRC_DIR)/%.c $(C_DEPS) $(CONFIG_DEPS)
 	$(CC_C) -c -o $@ $< $(C_CFLAGS)

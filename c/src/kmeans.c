@@ -1,6 +1,9 @@
 #include <float.h>
 #include <math.h>
 #include <omp.h>
+#ifdef PROFILE
+#include <stdio.h>
+#endif
 #include <stdlib.h>
 #include <time.h>
 
@@ -40,6 +43,14 @@ void kmeans(struct pixel *pixels, size_t n_pixels,
             struct pixel *centroids, size_t n_centroids,
             size_t *labels)
 {
+#ifdef PROFILE
+    clock_t exec_begin;
+    double exec_time_kernel1;
+    double exec_time_kernel2;
+    double exec_time_kernel3;
+    double exec_time_kernel4;
+#endif
+
     // seed rand
     srand(time(NULL));
 
@@ -48,6 +59,9 @@ void kmeans(struct pixel *pixels, size_t n_pixels,
     size_t *counts = malloc(n_centroids *  sizeof(size_t));
 
     // randomly initialize centroids
+#ifdef PROFILE
+    exec_begin = clock();
+#endif
     for (size_t i = 0u; i < n_centroids; ++i) {
         centroids[i] = pixels[rand() % n_pixels];
 
@@ -56,12 +70,19 @@ void kmeans(struct pixel *pixels, size_t n_pixels,
 
         counts[i] = 0u;
     }
+#ifdef PROFILE
+    exec_time_kernel1 = (double) (clock() - exec_begin) / CLOCKS_PER_SEC;
+#endif
 
     // repeat for KMEANS_MAX_ITER or until solution is stationary
-    for (int iter = 0; iter < KMEANS_MAX_ITER; ++iter) {
+    int iter;
+    for (iter = 0; iter < KMEANS_MAX_ITER; ++iter) {
         int done = 1;
 
         // reassign points to closest centroids
+#ifdef PROFILE
+        exec_begin = clock();
+#endif
         for (size_t i = 0u; i < n_pixels; ++i) {
             struct pixel pixel = pixels[i];
 
@@ -85,8 +106,14 @@ void kmeans(struct pixel *pixels, size_t n_pixels,
             // update cluster size
             counts[closest_centroid]++;
         }
+#ifdef PROFILE
+        exec_time_kernel2 = (double) (clock() - exec_begin) / CLOCKS_PER_SEC;
+#endif
 
         // repair empty clusters
+#ifdef PROFILE
+        exec_begin = clock();
+#endif
         for (size_t i = 0u; i < n_centroids; ++i) {
             if (counts[i])
                 continue;
@@ -138,8 +165,14 @@ void kmeans(struct pixel *pixels, size_t n_pixels,
             counts[i] = 1u;
             counts[largest_cluster]--;
         }
+#ifdef PROFILE
+        exec_time_kernel3 = (double) (clock() - exec_begin) / CLOCKS_PER_SEC;
+#endif
 
         // average accumulated cluster sums
+#ifdef PROFILE
+        exec_begin = clock();
+#endif
         for (int j = 0; j < n_centroids; ++j) {
             struct pixel *centroid = &centroids[j];
             struct pixel *sum = &sums[j];
@@ -155,11 +188,21 @@ void kmeans(struct pixel *pixels, size_t n_pixels,
 
             counts[j] = 0u;
         }
+#ifdef PROFILE
+        exec_time_kernel4 = (double) (clock() - exec_begin) / CLOCKS_PER_SEC;
+#endif
 
         // break if no pixel has changed cluster
         if (done)
             break;
     }
+#ifdef PROFILE
+    printf("Total kernel execution times:\n");
+    printf("Kernel 1 (random centroid initialization): %.3e\n", exec_time_kernel1);
+    printf("Kernel 2 (reassigning points to closest centroids): %.3e\n", exec_time_kernel2);
+    printf("Kernel 3 (repairing empty clusters): %.3e\n", exec_time_kernel3);
+    printf("Kernel 4 (average accumulated centroids): %.3e\n", exec_time_kernel4);
+#endif
 }
 
 void kmeans_omp(struct pixel *pixels, size_t n_pixels,

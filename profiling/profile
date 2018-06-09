@@ -1,0 +1,711 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls   s/call   s/call  name    
+ 57.36      0.86     0.86 26214400     0.00     0.00  find_closest_centroid
+ 32.01      1.34     0.48 262144000     0.00     0.00  pixel_dist
+  8.00      1.46     0.12        1     0.12     1.46  kmeans
+  0.67      1.47     0.01   786432     0.00     0.00  cv::Vec<unsigned char, 3>::operator[](int)
+  0.67      1.48     0.01   786432     0.00     0.00  cv::Vec<unsigned char, 3>::operator[](int) const
+  0.67      1.49     0.01        2     0.01     0.01  __gnu_cxx::__enable_if<!std::__is_scalar<pixel>::__value, pixel*>::__type std::__fill_n_a<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&)
+  0.67      1.50     0.01                             KmeansPureCWrapper::~KmeansPureCWrapper()
+  0.00      1.50     0.00  1572896     0.00     0.00  std::vector<pixel, std::allocator<pixel> >::operator[](unsigned long)
+  0.00      1.50     0.00   786432     0.00     0.00  cv::Vec<unsigned char, 3>& cv::Mat::at<cv::Vec<unsigned char, 3> >(int, int)
+  0.00      1.50     0.00   786432     0.00     0.00  cv::Vec<unsigned char, 3> const& cv::Mat::at<cv::Vec<unsigned char, 3> >(int, int) const
+  0.00      1.50     0.00   262145     0.00     0.00  std::vector<unsigned long, std::allocator<unsigned long> >::operator[](unsigned long)
+  0.00      1.50     0.00        6     0.00     0.00  cv::Mat::release()
+  0.00      1.50     0.00        4     0.00     0.00  cv::Mat::MStep::operator[](int)
+  0.00      1.50     0.00        4     0.00     0.00  cv::Mat::~Mat()
+  0.00      1.50     0.00        4     0.00     0.00  __gnu_cxx::new_allocator<pixel>::~new_allocator()
+  0.00      1.50     0.00        4     0.00     0.00  cv::Mat::MStep::operator[](int) const
+  0.00      1.50     0.00        4     0.00     0.00  std::allocator<pixel>::~allocator()
+  0.00      1.50     0.00        4     0.00     0.00  std::_Vector_base<pixel, std::allocator<pixel> >::_M_get_Tp_allocator()
+  0.00      1.50     0.00        3     0.00     0.00  cv::Mat::MSize::MSize(int*)
+  0.00      1.50     0.00        3     0.00     0.00  cv::Mat::MStep::MStep()
+  0.00      1.50     0.00        3     0.00     0.00  cv::Mat::initEmpty()
+  0.00      1.50     0.00        2     0.00     0.00  cv::Mat::Mat()
+  0.00      1.50     0.00        2     0.00     0.00  cv::Mat::operator=(cv::Mat const&)
+  0.00      1.50     0.00        2     0.00     0.00  __gnu_cxx::new_allocator<pixel>::deallocate(pixel*, unsigned long)
+  0.00      1.50     0.00        2     0.00     0.00  __gnu_cxx::new_allocator<pixel>::allocate(unsigned long, void const*)
+  0.00      1.50     0.00        2     0.00     0.00  __gnu_cxx::new_allocator<pixel>::new_allocator(__gnu_cxx::new_allocator<pixel> const&)
+  0.00      1.50     0.00        2     0.00     0.00  __gnu_cxx::new_allocator<pixel>::new_allocator()
+  0.00      1.50     0.00        2     0.00     0.00  __gnu_cxx::new_allocator<unsigned long>::~new_allocator()
+  0.00      1.50     0.00        2     0.00     0.00  __gnu_cxx::new_allocator<pixel>::max_size() const
+  0.00      1.50     0.00        2     0.00     0.00  std::allocator<pixel>::allocator(std::allocator<pixel> const&)
+  0.00      1.50     0.00        2     0.00     0.00  std::allocator<pixel>::allocator()
+  0.00      1.50     0.00        2     0.00     0.00  std::allocator<unsigned long>::~allocator()
+  0.00      1.50     0.00        2     0.00     0.00  std::_Iter_base<pixel*, false>::_S_base(pixel*)
+  0.00      1.50     0.00        2     0.00     0.00  void std::_Destroy_aux<true>::__destroy<pixel*>(pixel*, pixel*)
+  0.00      1.50     0.00        2     0.00     0.00  std::_Vector_base<pixel, std::allocator<pixel> >::_M_allocate(unsigned long)
+  0.00      1.50     0.00        2     0.00     0.00  std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::_Vector_impl(std::allocator<pixel> const&)
+  0.00      1.50     0.00        2     0.00     0.00  std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::~_Vector_impl()
+  0.00      1.50     0.00        2     0.00     0.00  std::_Vector_base<pixel, std::allocator<pixel> >::_M_deallocate(pixel*, unsigned long)
+  0.00      1.50     0.00        2     0.00     0.00  std::_Vector_base<pixel, std::allocator<pixel> >::_M_create_storage(unsigned long)
+  0.00      1.50     0.00        2     0.00     0.00  std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_base(unsigned long, std::allocator<pixel> const&)
+  0.00      1.50     0.00        2     0.00     0.00  std::_Vector_base<pixel, std::allocator<pixel> >::~_Vector_base()
+  0.00      1.50     0.00        2     0.00     0.00  std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_get_Tp_allocator()
+  0.00      1.50     0.00        2     0.00     0.00  std::allocator_traits<std::allocator<pixel> >::deallocate(std::allocator<pixel>&, pixel*, unsigned long)
+  0.00      1.50     0.00        2     0.00     0.00  std::allocator_traits<std::allocator<pixel> >::allocate(std::allocator<pixel>&, unsigned long)
+  0.00      1.50     0.00        2     0.00     0.01  pixel* std::__uninitialized_default_n_1<true>::__uninit_default_n<pixel*, unsigned long>(pixel*, unsigned long)
+  0.00      1.50     0.00        2     0.00     0.01  std::vector<pixel, std::allocator<pixel> >::_M_default_initialize(unsigned long)
+  0.00      1.50     0.00        2     0.00     0.01  std::vector<pixel, std::allocator<pixel> >::vector(unsigned long, std::allocator<pixel> const&)
+  0.00      1.50     0.00        2     0.00     0.00  std::vector<pixel, std::allocator<pixel> >::~vector()
+  0.00      1.50     0.00        2     0.00     0.00  std::_Niter_base<pixel*>::iterator_type std::__niter_base<pixel*>(pixel*)
+  0.00      1.50     0.00        2     0.00     0.01  pixel* std::__uninitialized_default_n<pixel*, unsigned long>(pixel*, unsigned long)
+  0.00      1.50     0.00        2     0.00     0.01  pixel* std::__uninitialized_default_n_a<pixel*, unsigned long, pixel>(pixel*, unsigned long, std::allocator<pixel>&)
+  0.00      1.50     0.00        2     0.00     0.01  pixel* std::fill_n<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&)
+  0.00      1.50     0.00        2     0.00     0.00  void std::_Destroy<pixel*>(pixel*, pixel*)
+  0.00      1.50     0.00        2     0.00     0.00  void std::_Destroy<pixel*, pixel>(pixel*, pixel*, std::allocator<pixel>&)
+  0.00      1.50     0.00        1     0.00     0.00  _GLOBAL__sub_I_main
+  0.00      1.50     0.00        1     0.00     0.00  __static_initialization_and_destruction_0(int, int)
+  0.00      1.50     0.00        1     0.00     0.00  KmeansWrapper::stop_timer()
+  0.00      1.50     0.00        1     0.00     0.00  KmeansWrapper::start_timer()
+  0.00      1.50     0.00        1     0.00     0.00  KmeansWrapper::KmeansWrapper()
+  0.00      1.50     0.00        1     0.00     0.00  KmeansWrapper::~KmeansWrapper()
+  0.00      1.50     0.00        1     0.00     1.49  KmeansCWrapper::exec(cv::Mat const&, unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  KmeansCWrapper::KmeansCWrapper(void (*)(pixel*, unsigned long, pixel*, unsigned long, unsigned long*), int)
+  0.00      1.50     0.00        1     0.00     0.00  KmeansCWrapper::~KmeansCWrapper()
+  0.00      1.50     0.00        1     0.00     0.00  KmeansPureCWrapper::KmeansPureCWrapper()
+  0.00      1.50     0.00        1     0.00     0.00  KmeansPureCWrapper::~KmeansPureCWrapper()
+  0.00      1.50     0.00        1     0.00     0.00  cv::Mat::create(int, int, int)
+  0.00      1.50     0.00        1     0.00     0.00  cv::Mat::Mat(cv::Size_<int>, int)
+  0.00      1.50     0.00        1     0.00     0.00  cv::Size_<int>::Size_(int, int)
+  0.00      1.50     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<unsigned long>::deallocate(unsigned long*, unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<unsigned long>::allocate(unsigned long, void const*)
+  0.00      1.50     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<unsigned long>::new_allocator(__gnu_cxx::new_allocator<unsigned long> const&)
+  0.00      1.50     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<unsigned long>::new_allocator()
+  0.00      1.50     0.00        1     0.00     0.00  int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int)
+  0.00      1.50     0.00        1     0.00     0.00  cv::Mat::type() const
+  0.00      1.50     0.00        1     0.00     0.00  cv::Mat::MSize::operator()() const
+  0.00      1.50     0.00        1     0.00     0.00  cv::Mat::empty() const
+  0.00      1.50     0.00        1     0.00     0.00  cv::Mat::total() const
+  0.00      1.50     0.00        1     0.00     0.00  __gnu_cxx::new_allocator<unsigned long>::max_size() const
+  0.00      1.50     0.00        1     0.00     0.00  std::allocator<unsigned long>::allocator(std::allocator<unsigned long> const&)
+  0.00      1.50     0.00        1     0.00     0.00  std::allocator<unsigned long>::allocator()
+  0.00      1.50     0.00        1     0.00     0.00  std::_Iter_base<unsigned long*, false>::_S_base(unsigned long*)
+  0.00      1.50     0.00        1     0.00     0.00  void std::_Destroy_aux<true>::__destroy<unsigned long*>(unsigned long*, unsigned long*)
+  0.00      1.50     0.00        1     0.00     0.00  std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_allocate(unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::_Vector_impl(std::allocator<unsigned long> const&)
+  0.00      1.50     0.00        1     0.00     0.00  std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::~_Vector_impl()
+  0.00      1.50     0.00        1     0.00     0.00  std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_deallocate(unsigned long*, unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_create_storage(unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_base(unsigned long, std::allocator<unsigned long> const&)
+  0.00      1.50     0.00        1     0.00     0.00  std::_Vector_base<unsigned long, std::allocator<unsigned long> >::~_Vector_base()
+  0.00      1.50     0.00        1     0.00     0.00  std::allocator_traits<std::allocator<unsigned long> >::deallocate(std::allocator<unsigned long>&, unsigned long*, unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  std::allocator_traits<std::allocator<unsigned long> >::allocate(std::allocator<unsigned long>&, unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  unsigned long* std::__uninitialized_default_n_1<true>::__uninit_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  std::vector<unsigned long, std::allocator<unsigned long> >::_M_default_initialize(unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  std::vector<unsigned long, std::allocator<unsigned long> >::vector(unsigned long, std::allocator<unsigned long> const&)
+  0.00      1.50     0.00        1     0.00     0.00  std::vector<unsigned long, std::allocator<unsigned long> >::~vector()
+  0.00      1.50     0.00        1     0.00     0.00  std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int)
+  0.00      1.50     0.00        1     0.00     0.00  __gnu_cxx::__enable_if<std::__is_scalar<unsigned long>::__value, unsigned long*>::__type std::__fill_n_a<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&)
+  0.00      1.50     0.00        1     0.00     0.00  std::_Niter_base<unsigned long*>::iterator_type std::__niter_base<unsigned long*>(unsigned long*)
+  0.00      1.50     0.00        1     0.00     0.00  unsigned long* std::__uninitialized_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long)
+  0.00      1.50     0.00        1     0.00     0.00  unsigned long* std::__uninitialized_default_n_a<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, std::allocator<unsigned long>&)
+  0.00      1.50     0.00        1     0.00     0.00  unsigned long* std::fill_n<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&)
+  0.00      1.50     0.00        1     0.00     0.00  void std::_Destroy<unsigned long*>(unsigned long*, unsigned long*)
+  0.00      1.50     0.00        1     0.00     0.00  void std::_Destroy<unsigned long*, unsigned long>(unsigned long*, unsigned long*, std::allocator<unsigned long>&)
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2015 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 2 byte(s) for 0.67% of 1.50 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     99.3    0.00    1.49                 main [1]
+                0.00    1.49       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+                0.00    0.00       2/4           cv::Mat::~Mat() [29]
+                0.00    0.00       1/2           cv::Mat::Mat() [37]
+                0.00    0.00       1/2           cv::Mat::operator=(cv::Mat const&) [38]
+                0.00    0.00       1/1           cv::Mat::empty() const [84]
+                0.00    0.00       1/1           std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int) [104]
+                0.00    0.00       1/1           KmeansPureCWrapper::KmeansPureCWrapper() [72]
+                0.00    0.00       1/1           KmeansPureCWrapper::~KmeansPureCWrapper() [73]
+-----------------------------------------------
+                0.00    1.49       1/1           main [1]
+[2]     99.3    0.00    1.49       1         KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+                0.12    1.34       1/1           kmeans [3]
+                0.01    0.00  786432/786432      cv::Vec<unsigned char, 3>::operator[](int) const [7]
+                0.01    0.00  786432/786432      cv::Vec<unsigned char, 3>::operator[](int) [6]
+                0.00    0.01       2/2           std::vector<pixel, std::allocator<pixel> >::vector(unsigned long, std::allocator<pixel> const&) [10]
+                0.00    0.00 1572896/1572896     std::vector<pixel, std::allocator<pixel> >::operator[](unsigned long) [23]
+                0.00    0.00  786432/786432      cv::Vec<unsigned char, 3> const& cv::Mat::at<cv::Vec<unsigned char, 3> >(int, int) const [25]
+                0.00    0.00  786432/786432      cv::Vec<unsigned char, 3>& cv::Mat::at<cv::Vec<unsigned char, 3> >(int, int) [24]
+                0.00    0.00  262145/262145      std::vector<unsigned long, std::allocator<unsigned long> >::operator[](unsigned long) [26]
+                0.00    0.00       2/2           std::allocator<pixel>::allocator() [46]
+                0.00    0.00       2/4           std::allocator<pixel>::~allocator() [32]
+                0.00    0.00       2/2           std::vector<pixel, std::allocator<pixel> >::~vector() [60]
+                0.00    0.00       1/1           std::allocator<unsigned long>::allocator() [88]
+                0.00    0.00       1/1           std::vector<unsigned long, std::allocator<unsigned long> >::vector(unsigned long, std::allocator<unsigned long> const&) [102]
+                0.00    0.00       1/2           std::allocator<unsigned long>::~allocator() [47]
+                0.00    0.00       1/1           KmeansWrapper::start_timer() [67]
+                0.00    0.00       1/1           KmeansWrapper::stop_timer() [66]
+                0.00    0.00       1/1           cv::Mat::type() const [82]
+                0.00    0.00       1/1           cv::Mat::MSize::operator()() const [83]
+                0.00    0.00       1/1           cv::Mat::Mat(cv::Size_<int>, int) [75]
+                0.00    0.00       1/2           cv::Mat::operator=(cv::Mat const&) [38]
+                0.00    0.00       1/4           cv::Mat::~Mat() [29]
+                0.00    0.00       1/1           std::vector<unsigned long, std::allocator<unsigned long> >::~vector() [103]
+-----------------------------------------------
+                0.12    1.34       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[3]     97.3    0.12    1.34       1         kmeans [3]
+                0.86    0.48 26214400/26214400     find_closest_centroid [4]
+-----------------------------------------------
+                0.86    0.48 26214400/26214400     kmeans [3]
+[4]     89.3    0.86    0.48 26214400         find_closest_centroid [4]
+                0.48    0.00 262144000/262144000     pixel_dist [5]
+-----------------------------------------------
+                0.48    0.00 262144000/262144000     find_closest_centroid [4]
+[5]     32.0    0.48    0.00 262144000         pixel_dist [5]
+-----------------------------------------------
+                0.01    0.00  786432/786432      KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[6]      0.7    0.01    0.00  786432         cv::Vec<unsigned char, 3>::operator[](int) [6]
+-----------------------------------------------
+                0.01    0.00  786432/786432      KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[7]      0.7    0.01    0.00  786432         cv::Vec<unsigned char, 3>::operator[](int) const [7]
+-----------------------------------------------
+                0.00    0.01       2/2           pixel* std::__uninitialized_default_n<pixel*, unsigned long>(pixel*, unsigned long) [12]
+[8]      0.7    0.00    0.01       2         pixel* std::__uninitialized_default_n_1<true>::__uninit_default_n<pixel*, unsigned long>(pixel*, unsigned long) [8]
+                0.00    0.01       2/2           pixel* std::fill_n<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&) [14]
+-----------------------------------------------
+                0.00    0.01       2/2           std::vector<pixel, std::allocator<pixel> >::vector(unsigned long, std::allocator<pixel> const&) [10]
+[9]      0.7    0.00    0.01       2         std::vector<pixel, std::allocator<pixel> >::_M_default_initialize(unsigned long) [9]
+                0.00    0.01       2/2           pixel* std::__uninitialized_default_n_a<pixel*, unsigned long, pixel>(pixel*, unsigned long, std::allocator<pixel>&) [13]
+                0.00    0.00       2/4           std::_Vector_base<pixel, std::allocator<pixel> >::_M_get_Tp_allocator() [33]
+-----------------------------------------------
+                0.00    0.01       2/2           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[10]     0.7    0.00    0.01       2         std::vector<pixel, std::allocator<pixel> >::vector(unsigned long, std::allocator<pixel> const&) [10]
+                0.00    0.01       2/2           std::vector<pixel, std::allocator<pixel> >::_M_default_initialize(unsigned long) [9]
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_base(unsigned long, std::allocator<pixel> const&) [55]
+-----------------------------------------------
+                0.01    0.00       2/2           pixel* std::fill_n<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&) [14]
+[11]     0.7    0.01    0.00       2         __gnu_cxx::__enable_if<!std::__is_scalar<pixel>::__value, pixel*>::__type std::__fill_n_a<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&) [11]
+-----------------------------------------------
+                0.00    0.01       2/2           pixel* std::__uninitialized_default_n_a<pixel*, unsigned long, pixel>(pixel*, unsigned long, std::allocator<pixel>&) [13]
+[12]     0.7    0.00    0.01       2         pixel* std::__uninitialized_default_n<pixel*, unsigned long>(pixel*, unsigned long) [12]
+                0.00    0.01       2/2           pixel* std::__uninitialized_default_n_1<true>::__uninit_default_n<pixel*, unsigned long>(pixel*, unsigned long) [8]
+-----------------------------------------------
+                0.00    0.01       2/2           std::vector<pixel, std::allocator<pixel> >::_M_default_initialize(unsigned long) [9]
+[13]     0.7    0.00    0.01       2         pixel* std::__uninitialized_default_n_a<pixel*, unsigned long, pixel>(pixel*, unsigned long, std::allocator<pixel>&) [13]
+                0.00    0.01       2/2           pixel* std::__uninitialized_default_n<pixel*, unsigned long>(pixel*, unsigned long) [12]
+-----------------------------------------------
+                0.00    0.01       2/2           pixel* std::__uninitialized_default_n_1<true>::__uninit_default_n<pixel*, unsigned long>(pixel*, unsigned long) [8]
+[14]     0.7    0.00    0.01       2         pixel* std::fill_n<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&) [14]
+                0.01    0.00       2/2           __gnu_cxx::__enable_if<!std::__is_scalar<pixel>::__value, pixel*>::__type std::__fill_n_a<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&) [11]
+                0.00    0.00       2/2           std::_Niter_base<pixel*>::iterator_type std::__niter_base<pixel*>(pixel*) [61]
+-----------------------------------------------
+                                                 <spontaneous>
+[15]     0.7    0.01    0.00                 KmeansPureCWrapper::~KmeansPureCWrapper() [15]
+-----------------------------------------------
+                0.00    0.00 1572896/1572896     KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[23]     0.0    0.00    0.00 1572896         std::vector<pixel, std::allocator<pixel> >::operator[](unsigned long) [23]
+-----------------------------------------------
+                0.00    0.00  786432/786432      KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[24]     0.0    0.00    0.00  786432         cv::Vec<unsigned char, 3>& cv::Mat::at<cv::Vec<unsigned char, 3> >(int, int) [24]
+-----------------------------------------------
+                0.00    0.00  786432/786432      KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[25]     0.0    0.00    0.00  786432         cv::Vec<unsigned char, 3> const& cv::Mat::at<cv::Vec<unsigned char, 3> >(int, int) const [25]
+-----------------------------------------------
+                0.00    0.00  262145/262145      KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[26]     0.0    0.00    0.00  262145         std::vector<unsigned long, std::allocator<unsigned long> >::operator[](unsigned long) [26]
+-----------------------------------------------
+                0.00    0.00       2/6           cv::Mat::operator=(cv::Mat const&) [38]
+                0.00    0.00       4/6           cv::Mat::~Mat() [29]
+[27]     0.0    0.00    0.00       6         cv::Mat::release() [27]
+-----------------------------------------------
+                0.00    0.00       4/4           cv::Mat::operator=(cv::Mat const&) [38]
+[28]     0.0    0.00    0.00       4         cv::Mat::MStep::operator[](int) [28]
+-----------------------------------------------
+                0.00    0.00       1/4           KmeansWrapper::~KmeansWrapper() [69]
+                0.00    0.00       1/4           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+                0.00    0.00       2/4           main [1]
+[29]     0.0    0.00    0.00       4         cv::Mat::~Mat() [29]
+                0.00    0.00       4/6           cv::Mat::release() [27]
+-----------------------------------------------
+                0.00    0.00       4/4           std::allocator<pixel>::~allocator() [32]
+[30]     0.0    0.00    0.00       4         __gnu_cxx::new_allocator<pixel>::~new_allocator() [30]
+-----------------------------------------------
+                0.00    0.00       4/4           cv::Mat::operator=(cv::Mat const&) [38]
+[31]     0.0    0.00    0.00       4         cv::Mat::MStep::operator[](int) const [31]
+-----------------------------------------------
+                0.00    0.00       2/4           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+                0.00    0.00       2/4           std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::~_Vector_impl() [52]
+[32]     0.0    0.00    0.00       4         std::allocator<pixel>::~allocator() [32]
+                0.00    0.00       4/4           __gnu_cxx::new_allocator<pixel>::~new_allocator() [30]
+-----------------------------------------------
+                0.00    0.00       2/4           std::vector<pixel, std::allocator<pixel> >::~vector() [60]
+                0.00    0.00       2/4           std::vector<pixel, std::allocator<pixel> >::_M_default_initialize(unsigned long) [9]
+[33]     0.0    0.00    0.00       4         std::_Vector_base<pixel, std::allocator<pixel> >::_M_get_Tp_allocator() [33]
+-----------------------------------------------
+                0.00    0.00       1/3           cv::Mat::Mat(cv::Size_<int>, int) [75]
+                0.00    0.00       2/3           cv::Mat::Mat() [37]
+[34]     0.0    0.00    0.00       3         cv::Mat::MSize::MSize(int*) [34]
+-----------------------------------------------
+                0.00    0.00       1/3           cv::Mat::Mat(cv::Size_<int>, int) [75]
+                0.00    0.00       2/3           cv::Mat::Mat() [37]
+[35]     0.0    0.00    0.00       3         cv::Mat::MStep::MStep() [35]
+-----------------------------------------------
+                0.00    0.00       1/3           cv::Mat::Mat(cv::Size_<int>, int) [75]
+                0.00    0.00       2/3           cv::Mat::Mat() [37]
+[36]     0.0    0.00    0.00       3         cv::Mat::initEmpty() [36]
+-----------------------------------------------
+                0.00    0.00       1/2           main [1]
+                0.00    0.00       1/2           KmeansWrapper::KmeansWrapper() [68]
+[37]     0.0    0.00    0.00       2         cv::Mat::Mat() [37]
+                0.00    0.00       2/3           cv::Mat::MSize::MSize(int*) [34]
+                0.00    0.00       2/3           cv::Mat::initEmpty() [36]
+                0.00    0.00       2/3           cv::Mat::MStep::MStep() [35]
+-----------------------------------------------
+                0.00    0.00       1/2           main [1]
+                0.00    0.00       1/2           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[38]     0.0    0.00    0.00       2         cv::Mat::operator=(cv::Mat const&) [38]
+                0.00    0.00       4/4           cv::Mat::MStep::operator[](int) [28]
+                0.00    0.00       4/4           cv::Mat::MStep::operator[](int) const [31]
+                0.00    0.00       2/6           cv::Mat::release() [27]
+-----------------------------------------------
+                0.00    0.00       2/2           std::allocator_traits<std::allocator<pixel> >::deallocate(std::allocator<pixel>&, pixel*, unsigned long) [58]
+[39]     0.0    0.00    0.00       2         __gnu_cxx::new_allocator<pixel>::deallocate(pixel*, unsigned long) [39]
+-----------------------------------------------
+                0.00    0.00       2/2           std::allocator_traits<std::allocator<pixel> >::allocate(std::allocator<pixel>&, unsigned long) [59]
+[40]     0.0    0.00    0.00       2         __gnu_cxx::new_allocator<pixel>::allocate(unsigned long, void const*) [40]
+                0.00    0.00       2/2           __gnu_cxx::new_allocator<pixel>::max_size() const [44]
+-----------------------------------------------
+                0.00    0.00       2/2           std::allocator<pixel>::allocator(std::allocator<pixel> const&) [45]
+[41]     0.0    0.00    0.00       2         __gnu_cxx::new_allocator<pixel>::new_allocator(__gnu_cxx::new_allocator<pixel> const&) [41]
+-----------------------------------------------
+                0.00    0.00       2/2           std::allocator<pixel>::allocator() [46]
+[42]     0.0    0.00    0.00       2         __gnu_cxx::new_allocator<pixel>::new_allocator() [42]
+-----------------------------------------------
+                0.00    0.00       2/2           std::allocator<unsigned long>::~allocator() [47]
+[43]     0.0    0.00    0.00       2         __gnu_cxx::new_allocator<unsigned long>::~new_allocator() [43]
+-----------------------------------------------
+                0.00    0.00       2/2           __gnu_cxx::new_allocator<pixel>::allocate(unsigned long, void const*) [40]
+[44]     0.0    0.00    0.00       2         __gnu_cxx::new_allocator<pixel>::max_size() const [44]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::_Vector_impl(std::allocator<pixel> const&) [51]
+[45]     0.0    0.00    0.00       2         std::allocator<pixel>::allocator(std::allocator<pixel> const&) [45]
+                0.00    0.00       2/2           __gnu_cxx::new_allocator<pixel>::new_allocator(__gnu_cxx::new_allocator<pixel> const&) [41]
+-----------------------------------------------
+                0.00    0.00       2/2           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[46]     0.0    0.00    0.00       2         std::allocator<pixel>::allocator() [46]
+                0.00    0.00       2/2           __gnu_cxx::new_allocator<pixel>::new_allocator() [42]
+-----------------------------------------------
+                0.00    0.00       1/2           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+                0.00    0.00       1/2           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::~_Vector_impl() [93]
+[47]     0.0    0.00    0.00       2         std::allocator<unsigned long>::~allocator() [47]
+                0.00    0.00       2/2           __gnu_cxx::new_allocator<unsigned long>::~new_allocator() [43]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Niter_base<pixel*>::iterator_type std::__niter_base<pixel*>(pixel*) [61]
+[48]     0.0    0.00    0.00       2         std::_Iter_base<pixel*, false>::_S_base(pixel*) [48]
+-----------------------------------------------
+                0.00    0.00       2/2           void std::_Destroy<pixel*>(pixel*, pixel*) [62]
+[49]     0.0    0.00    0.00       2         void std::_Destroy_aux<true>::__destroy<pixel*>(pixel*, pixel*) [49]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_M_create_storage(unsigned long) [54]
+[50]     0.0    0.00    0.00       2         std::_Vector_base<pixel, std::allocator<pixel> >::_M_allocate(unsigned long) [50]
+                0.00    0.00       2/2           std::allocator_traits<std::allocator<pixel> >::allocate(std::allocator<pixel>&, unsigned long) [59]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_base(unsigned long, std::allocator<pixel> const&) [55]
+[51]     0.0    0.00    0.00       2         std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::_Vector_impl(std::allocator<pixel> const&) [51]
+                0.00    0.00       2/2           std::allocator<pixel>::allocator(std::allocator<pixel> const&) [45]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::~_Vector_base() [56]
+[52]     0.0    0.00    0.00       2         std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::~_Vector_impl() [52]
+                0.00    0.00       2/4           std::allocator<pixel>::~allocator() [32]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::~_Vector_base() [56]
+[53]     0.0    0.00    0.00       2         std::_Vector_base<pixel, std::allocator<pixel> >::_M_deallocate(pixel*, unsigned long) [53]
+                0.00    0.00       2/2           std::allocator_traits<std::allocator<pixel> >::deallocate(std::allocator<pixel>&, pixel*, unsigned long) [58]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_base(unsigned long, std::allocator<pixel> const&) [55]
+[54]     0.0    0.00    0.00       2         std::_Vector_base<pixel, std::allocator<pixel> >::_M_create_storage(unsigned long) [54]
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_M_allocate(unsigned long) [50]
+-----------------------------------------------
+                0.00    0.00       2/2           std::vector<pixel, std::allocator<pixel> >::vector(unsigned long, std::allocator<pixel> const&) [10]
+[55]     0.0    0.00    0.00       2         std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_base(unsigned long, std::allocator<pixel> const&) [55]
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::_Vector_impl(std::allocator<pixel> const&) [51]
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_M_create_storage(unsigned long) [54]
+-----------------------------------------------
+                0.00    0.00       2/2           std::vector<pixel, std::allocator<pixel> >::~vector() [60]
+[56]     0.0    0.00    0.00       2         std::_Vector_base<pixel, std::allocator<pixel> >::~_Vector_base() [56]
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_M_deallocate(pixel*, unsigned long) [53]
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::~_Vector_impl() [52]
+-----------------------------------------------
+                0.00    0.00       1/2           std::vector<unsigned long, std::allocator<unsigned long> >::~vector() [103]
+                0.00    0.00       1/2           std::vector<unsigned long, std::allocator<unsigned long> >::_M_default_initialize(unsigned long) [101]
+[57]     0.0    0.00    0.00       2         std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_get_Tp_allocator() [57]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_M_deallocate(pixel*, unsigned long) [53]
+[58]     0.0    0.00    0.00       2         std::allocator_traits<std::allocator<pixel> >::deallocate(std::allocator<pixel>&, pixel*, unsigned long) [58]
+                0.00    0.00       2/2           __gnu_cxx::new_allocator<pixel>::deallocate(pixel*, unsigned long) [39]
+-----------------------------------------------
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::_M_allocate(unsigned long) [50]
+[59]     0.0    0.00    0.00       2         std::allocator_traits<std::allocator<pixel> >::allocate(std::allocator<pixel>&, unsigned long) [59]
+                0.00    0.00       2/2           __gnu_cxx::new_allocator<pixel>::allocate(unsigned long, void const*) [40]
+-----------------------------------------------
+                0.00    0.00       2/2           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[60]     0.0    0.00    0.00       2         std::vector<pixel, std::allocator<pixel> >::~vector() [60]
+                0.00    0.00       2/4           std::_Vector_base<pixel, std::allocator<pixel> >::_M_get_Tp_allocator() [33]
+                0.00    0.00       2/2           void std::_Destroy<pixel*, pixel>(pixel*, pixel*, std::allocator<pixel>&) [63]
+                0.00    0.00       2/2           std::_Vector_base<pixel, std::allocator<pixel> >::~_Vector_base() [56]
+-----------------------------------------------
+                0.00    0.00       2/2           pixel* std::fill_n<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&) [14]
+[61]     0.0    0.00    0.00       2         std::_Niter_base<pixel*>::iterator_type std::__niter_base<pixel*>(pixel*) [61]
+                0.00    0.00       2/2           std::_Iter_base<pixel*, false>::_S_base(pixel*) [48]
+-----------------------------------------------
+                0.00    0.00       2/2           void std::_Destroy<pixel*, pixel>(pixel*, pixel*, std::allocator<pixel>&) [63]
+[62]     0.0    0.00    0.00       2         void std::_Destroy<pixel*>(pixel*, pixel*) [62]
+                0.00    0.00       2/2           void std::_Destroy_aux<true>::__destroy<pixel*>(pixel*, pixel*) [49]
+-----------------------------------------------
+                0.00    0.00       2/2           std::vector<pixel, std::allocator<pixel> >::~vector() [60]
+[63]     0.0    0.00    0.00       2         void std::_Destroy<pixel*, pixel>(pixel*, pixel*, std::allocator<pixel>&) [63]
+                0.00    0.00       2/2           void std::_Destroy<pixel*>(pixel*, pixel*) [62]
+-----------------------------------------------
+                0.00    0.00       1/1           __libc_csu_init [127]
+[64]     0.0    0.00    0.00       1         _GLOBAL__sub_I_main [64]
+                0.00    0.00       1/1           __static_initialization_and_destruction_0(int, int) [65]
+-----------------------------------------------
+                0.00    0.00       1/1           _GLOBAL__sub_I_main [64]
+[65]     0.0    0.00    0.00       1         __static_initialization_and_destruction_0(int, int) [65]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[66]     0.0    0.00    0.00       1         KmeansWrapper::stop_timer() [66]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[67]     0.0    0.00    0.00       1         KmeansWrapper::start_timer() [67]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::KmeansCWrapper(void (*)(pixel*, unsigned long, pixel*, unsigned long, unsigned long*), int) [70]
+[68]     0.0    0.00    0.00       1         KmeansWrapper::KmeansWrapper() [68]
+                0.00    0.00       1/2           cv::Mat::Mat() [37]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::~KmeansCWrapper() [71]
+[69]     0.0    0.00    0.00       1         KmeansWrapper::~KmeansWrapper() [69]
+                0.00    0.00       1/4           cv::Mat::~Mat() [29]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansPureCWrapper::KmeansPureCWrapper() [72]
+[70]     0.0    0.00    0.00       1         KmeansCWrapper::KmeansCWrapper(void (*)(pixel*, unsigned long, pixel*, unsigned long, unsigned long*), int) [70]
+                0.00    0.00       1/1           KmeansWrapper::KmeansWrapper() [68]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansPureCWrapper::~KmeansPureCWrapper() [73]
+[71]     0.0    0.00    0.00       1         KmeansCWrapper::~KmeansCWrapper() [71]
+                0.00    0.00       1/1           KmeansWrapper::~KmeansWrapper() [69]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[72]     0.0    0.00    0.00       1         KmeansPureCWrapper::KmeansPureCWrapper() [72]
+                0.00    0.00       1/1           KmeansCWrapper::KmeansCWrapper(void (*)(pixel*, unsigned long, pixel*, unsigned long, unsigned long*), int) [70]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[73]     0.0    0.00    0.00       1         KmeansPureCWrapper::~KmeansPureCWrapper() [73]
+                0.00    0.00       1/1           KmeansCWrapper::~KmeansCWrapper() [71]
+-----------------------------------------------
+                0.00    0.00       1/1           cv::Mat::Mat(cv::Size_<int>, int) [75]
+[74]     0.0    0.00    0.00       1         cv::Mat::create(int, int, int) [74]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[75]     0.0    0.00    0.00       1         cv::Mat::Mat(cv::Size_<int>, int) [75]
+                0.00    0.00       1/3           cv::Mat::MSize::MSize(int*) [34]
+                0.00    0.00       1/3           cv::Mat::MStep::MStep() [35]
+                0.00    0.00       1/3           cv::Mat::initEmpty() [36]
+                0.00    0.00       1/1           cv::Mat::create(int, int, int) [74]
+-----------------------------------------------
+                0.00    0.00       1/1           cv::Mat::MSize::operator()() const [83]
+[76]     0.0    0.00    0.00       1         cv::Size_<int>::Size_(int, int) [76]
+-----------------------------------------------
+                0.00    0.00       1/1           std::allocator_traits<std::allocator<unsigned long> >::deallocate(std::allocator<unsigned long>&, unsigned long*, unsigned long) [98]
+[77]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<unsigned long>::deallocate(unsigned long*, unsigned long) [77]
+-----------------------------------------------
+                0.00    0.00       1/1           std::allocator_traits<std::allocator<unsigned long> >::allocate(std::allocator<unsigned long>&, unsigned long) [99]
+[78]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<unsigned long>::allocate(unsigned long, void const*) [78]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<unsigned long>::max_size() const [86]
+-----------------------------------------------
+                0.00    0.00       1/1           std::allocator<unsigned long>::allocator(std::allocator<unsigned long> const&) [87]
+[79]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<unsigned long>::new_allocator(__gnu_cxx::new_allocator<unsigned long> const&) [79]
+-----------------------------------------------
+                0.00    0.00       1/1           std::allocator<unsigned long>::allocator() [88]
+[80]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<unsigned long>::new_allocator() [80]
+-----------------------------------------------
+                0.00    0.00       1/1           std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int) [104]
+[81]     0.0    0.00    0.00       1         int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [81]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[82]     0.0    0.00    0.00       1         cv::Mat::type() const [82]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[83]     0.0    0.00    0.00       1         cv::Mat::MSize::operator()() const [83]
+                0.00    0.00       1/1           cv::Size_<int>::Size_(int, int) [76]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[84]     0.0    0.00    0.00       1         cv::Mat::empty() const [84]
+                0.00    0.00       1/1           cv::Mat::total() const [85]
+-----------------------------------------------
+                0.00    0.00       1/1           cv::Mat::empty() const [84]
+[85]     0.0    0.00    0.00       1         cv::Mat::total() const [85]
+-----------------------------------------------
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<unsigned long>::allocate(unsigned long, void const*) [78]
+[86]     0.0    0.00    0.00       1         __gnu_cxx::new_allocator<unsigned long>::max_size() const [86]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::_Vector_impl(std::allocator<unsigned long> const&) [92]
+[87]     0.0    0.00    0.00       1         std::allocator<unsigned long>::allocator(std::allocator<unsigned long> const&) [87]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<unsigned long>::new_allocator(__gnu_cxx::new_allocator<unsigned long> const&) [79]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[88]     0.0    0.00    0.00       1         std::allocator<unsigned long>::allocator() [88]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<unsigned long>::new_allocator() [80]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Niter_base<unsigned long*>::iterator_type std::__niter_base<unsigned long*>(unsigned long*) [106]
+[89]     0.0    0.00    0.00       1         std::_Iter_base<unsigned long*, false>::_S_base(unsigned long*) [89]
+-----------------------------------------------
+                0.00    0.00       1/1           void std::_Destroy<unsigned long*>(unsigned long*, unsigned long*) [110]
+[90]     0.0    0.00    0.00       1         void std::_Destroy_aux<true>::__destroy<unsigned long*>(unsigned long*, unsigned long*) [90]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_create_storage(unsigned long) [95]
+[91]     0.0    0.00    0.00       1         std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_allocate(unsigned long) [91]
+                0.00    0.00       1/1           std::allocator_traits<std::allocator<unsigned long> >::allocate(std::allocator<unsigned long>&, unsigned long) [99]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_base(unsigned long, std::allocator<unsigned long> const&) [96]
+[92]     0.0    0.00    0.00       1         std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::_Vector_impl(std::allocator<unsigned long> const&) [92]
+                0.00    0.00       1/1           std::allocator<unsigned long>::allocator(std::allocator<unsigned long> const&) [87]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::~_Vector_base() [97]
+[93]     0.0    0.00    0.00       1         std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::~_Vector_impl() [93]
+                0.00    0.00       1/2           std::allocator<unsigned long>::~allocator() [47]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::~_Vector_base() [97]
+[94]     0.0    0.00    0.00       1         std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_deallocate(unsigned long*, unsigned long) [94]
+                0.00    0.00       1/1           std::allocator_traits<std::allocator<unsigned long> >::deallocate(std::allocator<unsigned long>&, unsigned long*, unsigned long) [98]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_base(unsigned long, std::allocator<unsigned long> const&) [96]
+[95]     0.0    0.00    0.00       1         std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_create_storage(unsigned long) [95]
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_allocate(unsigned long) [91]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<unsigned long, std::allocator<unsigned long> >::vector(unsigned long, std::allocator<unsigned long> const&) [102]
+[96]     0.0    0.00    0.00       1         std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_base(unsigned long, std::allocator<unsigned long> const&) [96]
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::_Vector_impl(std::allocator<unsigned long> const&) [92]
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_create_storage(unsigned long) [95]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<unsigned long, std::allocator<unsigned long> >::~vector() [103]
+[97]     0.0    0.00    0.00       1         std::_Vector_base<unsigned long, std::allocator<unsigned long> >::~_Vector_base() [97]
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::~_Vector_impl() [93]
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_deallocate(unsigned long*, unsigned long) [94]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_deallocate(unsigned long*, unsigned long) [94]
+[98]     0.0    0.00    0.00       1         std::allocator_traits<std::allocator<unsigned long> >::deallocate(std::allocator<unsigned long>&, unsigned long*, unsigned long) [98]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<unsigned long>::deallocate(unsigned long*, unsigned long) [77]
+-----------------------------------------------
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_allocate(unsigned long) [91]
+[99]     0.0    0.00    0.00       1         std::allocator_traits<std::allocator<unsigned long> >::allocate(std::allocator<unsigned long>&, unsigned long) [99]
+                0.00    0.00       1/1           __gnu_cxx::new_allocator<unsigned long>::allocate(unsigned long, void const*) [78]
+-----------------------------------------------
+                0.00    0.00       1/1           unsigned long* std::__uninitialized_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long) [107]
+[100]    0.0    0.00    0.00       1         unsigned long* std::__uninitialized_default_n_1<true>::__uninit_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long) [100]
+                0.00    0.00       1/1           unsigned long* std::fill_n<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&) [109]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<unsigned long, std::allocator<unsigned long> >::vector(unsigned long, std::allocator<unsigned long> const&) [102]
+[101]    0.0    0.00    0.00       1         std::vector<unsigned long, std::allocator<unsigned long> >::_M_default_initialize(unsigned long) [101]
+                0.00    0.00       1/2           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_get_Tp_allocator() [57]
+                0.00    0.00       1/1           unsigned long* std::__uninitialized_default_n_a<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, std::allocator<unsigned long>&) [108]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[102]    0.0    0.00    0.00       1         std::vector<unsigned long, std::allocator<unsigned long> >::vector(unsigned long, std::allocator<unsigned long> const&) [102]
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_base(unsigned long, std::allocator<unsigned long> const&) [96]
+                0.00    0.00       1/1           std::vector<unsigned long, std::allocator<unsigned long> >::_M_default_initialize(unsigned long) [101]
+-----------------------------------------------
+                0.00    0.00       1/1           KmeansCWrapper::exec(cv::Mat const&, unsigned long) [2]
+[103]    0.0    0.00    0.00       1         std::vector<unsigned long, std::allocator<unsigned long> >::~vector() [103]
+                0.00    0.00       1/2           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_get_Tp_allocator() [57]
+                0.00    0.00       1/1           void std::_Destroy<unsigned long*, unsigned long>(unsigned long*, unsigned long*, std::allocator<unsigned long>&) [111]
+                0.00    0.00       1/1           std::_Vector_base<unsigned long, std::allocator<unsigned long> >::~_Vector_base() [97]
+-----------------------------------------------
+                0.00    0.00       1/1           main [1]
+[104]    0.0    0.00    0.00       1         std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int) [104]
+                0.00    0.00       1/1           int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [81]
+-----------------------------------------------
+                0.00    0.00       1/1           unsigned long* std::fill_n<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&) [109]
+[105]    0.0    0.00    0.00       1         __gnu_cxx::__enable_if<std::__is_scalar<unsigned long>::__value, unsigned long*>::__type std::__fill_n_a<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&) [105]
+-----------------------------------------------
+                0.00    0.00       1/1           unsigned long* std::fill_n<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&) [109]
+[106]    0.0    0.00    0.00       1         std::_Niter_base<unsigned long*>::iterator_type std::__niter_base<unsigned long*>(unsigned long*) [106]
+                0.00    0.00       1/1           std::_Iter_base<unsigned long*, false>::_S_base(unsigned long*) [89]
+-----------------------------------------------
+                0.00    0.00       1/1           unsigned long* std::__uninitialized_default_n_a<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, std::allocator<unsigned long>&) [108]
+[107]    0.0    0.00    0.00       1         unsigned long* std::__uninitialized_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long) [107]
+                0.00    0.00       1/1           unsigned long* std::__uninitialized_default_n_1<true>::__uninit_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long) [100]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<unsigned long, std::allocator<unsigned long> >::_M_default_initialize(unsigned long) [101]
+[108]    0.0    0.00    0.00       1         unsigned long* std::__uninitialized_default_n_a<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, std::allocator<unsigned long>&) [108]
+                0.00    0.00       1/1           unsigned long* std::__uninitialized_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long) [107]
+-----------------------------------------------
+                0.00    0.00       1/1           unsigned long* std::__uninitialized_default_n_1<true>::__uninit_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long) [100]
+[109]    0.0    0.00    0.00       1         unsigned long* std::fill_n<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&) [109]
+                0.00    0.00       1/1           std::_Niter_base<unsigned long*>::iterator_type std::__niter_base<unsigned long*>(unsigned long*) [106]
+                0.00    0.00       1/1           __gnu_cxx::__enable_if<std::__is_scalar<unsigned long>::__value, unsigned long*>::__type std::__fill_n_a<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&) [105]
+-----------------------------------------------
+                0.00    0.00       1/1           void std::_Destroy<unsigned long*, unsigned long>(unsigned long*, unsigned long*, std::allocator<unsigned long>&) [111]
+[110]    0.0    0.00    0.00       1         void std::_Destroy<unsigned long*>(unsigned long*, unsigned long*) [110]
+                0.00    0.00       1/1           void std::_Destroy_aux<true>::__destroy<unsigned long*>(unsigned long*, unsigned long*) [90]
+-----------------------------------------------
+                0.00    0.00       1/1           std::vector<unsigned long, std::allocator<unsigned long> >::~vector() [103]
+[111]    0.0    0.00    0.00       1         void std::_Destroy<unsigned long*, unsigned long>(unsigned long*, unsigned long*, std::allocator<unsigned long>&) [111]
+                0.00    0.00       1/1           void std::_Destroy<unsigned long*>(unsigned long*, unsigned long*) [110]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2015 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+  [64] _GLOBAL__sub_I_main    [81] int __gnu_cxx::__stoa<long, int, char, int>(long (*)(char const*, char**, int), char const*, char const*, unsigned long*, int) [97] std::_Vector_base<unsigned long, std::allocator<unsigned long> >::~_Vector_base()
+  [65] __static_initialization_and_destruction_0(int, int) [25] cv::Vec<unsigned char, 3> const& cv::Mat::at<cv::Vec<unsigned char, 3> >(int, int) const [58] std::allocator_traits<std::allocator<pixel> >::deallocate(std::allocator<pixel>&, pixel*, unsigned long)
+  [66] KmeansWrapper::stop_timer() [82] cv::Mat::type() const [59] std::allocator_traits<std::allocator<pixel> >::allocate(std::allocator<pixel>&, unsigned long)
+  [67] KmeansWrapper::start_timer() [83] cv::Mat::MSize::operator()() const [98] std::allocator_traits<std::allocator<unsigned long> >::deallocate(std::allocator<unsigned long>&, unsigned long*, unsigned long)
+  [68] KmeansWrapper::KmeansWrapper() [31] cv::Mat::MStep::operator[](int) const [99] std::allocator_traits<std::allocator<unsigned long> >::allocate(std::allocator<unsigned long>&, unsigned long)
+  [69] KmeansWrapper::~KmeansWrapper() [84] cv::Mat::empty() const [8] pixel* std::__uninitialized_default_n_1<true>::__uninit_default_n<pixel*, unsigned long>(pixel*, unsigned long)
+   [2] KmeansCWrapper::exec(cv::Mat const&, unsigned long) [85] cv::Mat::total() const [100] unsigned long* std::__uninitialized_default_n_1<true>::__uninit_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long)
+  [70] KmeansCWrapper::KmeansCWrapper(void (*)(pixel*, unsigned long, pixel*, unsigned long, unsigned long*), int) [7] cv::Vec<unsigned char, 3>::operator[](int) const [9] std::vector<pixel, std::allocator<pixel> >::_M_default_initialize(unsigned long)
+  [71] KmeansCWrapper::~KmeansCWrapper() [44] __gnu_cxx::new_allocator<pixel>::max_size() const [10] std::vector<pixel, std::allocator<pixel> >::vector(unsigned long, std::allocator<pixel> const&)
+  [72] KmeansPureCWrapper::KmeansPureCWrapper() [86] __gnu_cxx::new_allocator<unsigned long>::max_size() const [60] std::vector<pixel, std::allocator<pixel> >::~vector()
+  [15] KmeansPureCWrapper::~KmeansPureCWrapper() [45] std::allocator<pixel>::allocator(std::allocator<pixel> const&) [23] std::vector<pixel, std::allocator<pixel> >::operator[](unsigned long)
+  [73] KmeansPureCWrapper::~KmeansPureCWrapper() [46] std::allocator<pixel>::allocator() [101] std::vector<unsigned long, std::allocator<unsigned long> >::_M_default_initialize(unsigned long)
+  [24] cv::Vec<unsigned char, 3>& cv::Mat::at<cv::Vec<unsigned char, 3> >(int, int) [32] std::allocator<pixel>::~allocator() [102] std::vector<unsigned long, std::allocator<unsigned long> >::vector(unsigned long, std::allocator<unsigned long> const&)
+  [34] cv::Mat::MSize::MSize(int*) [87] std::allocator<unsigned long>::allocator(std::allocator<unsigned long> const&) [103] std::vector<unsigned long, std::allocator<unsigned long> >::~vector()
+  [35] cv::Mat::MStep::MStep() [88] std::allocator<unsigned long>::allocator() [26] std::vector<unsigned long, std::allocator<unsigned long> >::operator[](unsigned long)
+  [28] cv::Mat::MStep::operator[](int) [47] std::allocator<unsigned long>::~allocator() [104] std::__cxx11::stoi(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, unsigned long*, int)
+  [74] cv::Mat::create(int, int, int) [48] std::_Iter_base<pixel*, false>::_S_base(pixel*) [11] __gnu_cxx::__enable_if<!std::__is_scalar<pixel>::__value, pixel*>::__type std::__fill_n_a<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&)
+  [27] cv::Mat::release()     [89] std::_Iter_base<unsigned long*, false>::_S_base(unsigned long*) [105] __gnu_cxx::__enable_if<std::__is_scalar<unsigned long>::__value, unsigned long*>::__type std::__fill_n_a<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&)
+  [36] cv::Mat::initEmpty()   [49] void std::_Destroy_aux<true>::__destroy<pixel*>(pixel*, pixel*) [61] std::_Niter_base<pixel*>::iterator_type std::__niter_base<pixel*>(pixel*)
+  [75] cv::Mat::Mat(cv::Size_<int>, int) [90] void std::_Destroy_aux<true>::__destroy<unsigned long*>(unsigned long*, unsigned long*) [106] std::_Niter_base<unsigned long*>::iterator_type std::__niter_base<unsigned long*>(unsigned long*)
+  [37] cv::Mat::Mat()         [50] std::_Vector_base<pixel, std::allocator<pixel> >::_M_allocate(unsigned long) [12] pixel* std::__uninitialized_default_n<pixel*, unsigned long>(pixel*, unsigned long)
+  [29] cv::Mat::~Mat()        [51] std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::_Vector_impl(std::allocator<pixel> const&) [107] unsigned long* std::__uninitialized_default_n<unsigned long*, unsigned long>(unsigned long*, unsigned long)
+  [38] cv::Mat::operator=(cv::Mat const&) [52] std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_impl::~_Vector_impl() [13] pixel* std::__uninitialized_default_n_a<pixel*, unsigned long, pixel>(pixel*, unsigned long, std::allocator<pixel>&)
+   [6] cv::Vec<unsigned char, 3>::operator[](int) [53] std::_Vector_base<pixel, std::allocator<pixel> >::_M_deallocate(pixel*, unsigned long) [108] unsigned long* std::__uninitialized_default_n_a<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, std::allocator<unsigned long>&)
+  [76] cv::Size_<int>::Size_(int, int) [54] std::_Vector_base<pixel, std::allocator<pixel> >::_M_create_storage(unsigned long) [14] pixel* std::fill_n<pixel*, unsigned long, pixel>(pixel*, unsigned long, pixel const&)
+  [39] __gnu_cxx::new_allocator<pixel>::deallocate(pixel*, unsigned long) [33] std::_Vector_base<pixel, std::allocator<pixel> >::_M_get_Tp_allocator() [109] unsigned long* std::fill_n<unsigned long*, unsigned long, unsigned long>(unsigned long*, unsigned long, unsigned long const&)
+  [40] __gnu_cxx::new_allocator<pixel>::allocate(unsigned long, void const*) [55] std::_Vector_base<pixel, std::allocator<pixel> >::_Vector_base(unsigned long, std::allocator<pixel> const&) [62] void std::_Destroy<pixel*>(pixel*, pixel*)
+  [41] __gnu_cxx::new_allocator<pixel>::new_allocator(__gnu_cxx::new_allocator<pixel> const&) [56] std::_Vector_base<pixel, std::allocator<pixel> >::~_Vector_base() [63] void std::_Destroy<pixel*, pixel>(pixel*, pixel*, std::allocator<pixel>&)
+  [42] __gnu_cxx::new_allocator<pixel>::new_allocator() [91] std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_allocate(unsigned long) [110] void std::_Destroy<unsigned long*>(unsigned long*, unsigned long*)
+  [30] __gnu_cxx::new_allocator<pixel>::~new_allocator() [92] std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::_Vector_impl(std::allocator<unsigned long> const&) [111] void std::_Destroy<unsigned long*, unsigned long>(unsigned long*, unsigned long*, std::allocator<unsigned long>&)
+  [77] __gnu_cxx::new_allocator<unsigned long>::deallocate(unsigned long*, unsigned long) [93] std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_impl::~_Vector_impl() [4] find_closest_centroid
+  [78] __gnu_cxx::new_allocator<unsigned long>::allocate(unsigned long, void const*) [94] std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_deallocate(unsigned long*, unsigned long) [3] kmeans
+  [79] __gnu_cxx::new_allocator<unsigned long>::new_allocator(__gnu_cxx::new_allocator<unsigned long> const&) [95] std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_create_storage(unsigned long) [5] pixel_dist
+  [80] __gnu_cxx::new_allocator<unsigned long>::new_allocator() [57] std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_M_get_Tp_allocator()
+  [43] __gnu_cxx::new_allocator<unsigned long>::~new_allocator() [96] std::_Vector_base<unsigned long, std::allocator<unsigned long> >::_Vector_base(unsigned long, std::allocator<unsigned long> const&)
