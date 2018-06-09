@@ -57,6 +57,9 @@ int main(int argc, char **argv)
     wrappers.push_back(std::make_pair("OpenMP_triple", &omp_wrapper_triple));
     wrappers.push_back(std::make_pair("OpenMP_quad", &omp_wrapper_quad));
 
+    KmeansCUDAWrapper cuda_wrapper;
+    wrappers.push_back(std::make_pair("CUDA", &cuda_wrapper));
+
     for (size_t i = 0u; i < wrappers.size(); ++i) {
         std::string &name = std::get<0>(wrappers[i]);
         KmeansWrapper *wrapper = std::get<1>(wrappers[i]);

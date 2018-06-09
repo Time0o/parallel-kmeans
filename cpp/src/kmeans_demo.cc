@@ -51,6 +51,9 @@ int main(int argc, char **argv)
     KmeansOMPWrapper omp_c_wrapper;
     impl.push_back(std::make_pair("C + OpenMP", &omp_c_wrapper));
 
+    KmeansCUDAWrapper cuda_c_wrapper;
+    impl.push_back(std::make_pair("C + CUDA", &cuda_c_wrapper));
+
     // setup results display window
     const int margin = 10;
 

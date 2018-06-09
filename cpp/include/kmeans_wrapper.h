@@ -48,6 +48,12 @@ protected:
     int cores;
 };
 
+class KmeansCUDAWrapper : public KmeansCWrapper
+{
+public:
+    KmeansCUDAWrapper() : KmeansCWrapper(kmeans_cuda) {}
+};
+
 class KmeansOMPWrapper : public KmeansCWrapper
 {
 public:
@@ -57,5 +63,5 @@ public:
 class KmeansPureCWrapper : public KmeansCWrapper
 {
 public:
-    KmeansPureCWrapper() : KmeansCWrapper(kmeans) {}
+    KmeansPureCWrapper() : KmeansCWrapper(kmeans_c) {}
 };

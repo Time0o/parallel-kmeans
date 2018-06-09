@@ -31,12 +31,14 @@ DEPS=$(CONFIG_DEPS) $(C_DEPS) $(CPP_DEPS)
 
 # compilation settings
 CC_C=gcc-8
+CC_CUDA=nvcc
 CC_CPP=g++
 
-COMMON_CFLAGS=-Wall -g -O0 -I$(CONFIG_DIR) -I$(C_INCLUDE_DIR) -I$(CPP_INCLUDE_DIR) -fopenmp
+COMMON_CFLAGS=-Wall -g -O0 -fopenmp
 
-C_CFLAGS=-std=c99 $(COMMON_CFLAGS)
-CPP_CFLAGS=-std=c++11 $(COMMON_CFLAGS) `pkg-config --cflags opencv`
+C_CFLAGS=-std=c99 $(COMMON_CFLAGS) -I$(CONFIG_DIR) -I$(C_INCLUDE_DIR)
+CPP_CFLAGS=-std=c++11 $(COMMON_CFLAGS) -I$(CONFIG_DIR) -I$(C_INCLUDE_DIR) -I$(CPP_INCLUDE_DIR) `pkg-config --cflags opencv`
+CUDA_CFLAGS=-I$(CONFIG_DIR) -I$(C_INCLUDE_DIR)
 
 LFLAGS=`pkg-config --libs opencv` -fopenmp
 
@@ -66,17 +68,20 @@ DEMO_CLUSTERS=5
 # rules
 all: $(BUILD_DIR)/demo $(BUILD_DIR)/profile $(BUILD_DIR)/benchmark
 
-$(BUILD_DIR)/demo: $(CPP_OBJ_DIR)/kmeans_demo.o $(C_OBJ_DIR)/kmeans.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
-	$(CC_CPP) -o $@ $^ $(LFLAGS)
+$(BUILD_DIR)/demo: $(CPP_OBJ_DIR)/kmeans_demo.o $(C_OBJ_DIR)/kmeans.o $(C_OBJ_DIR)/kmeans_cuda.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
+	$(CC_CPP) -o $@ $^ $(LFLAGS) -L/usr/local/cuda/lib64 -lcuda -lcudart
 
 $(BUILD_DIR)/profile: $(CPP_OBJ_DIR)/kmeans_profile.o $(C_OBJ_DIR)/kmeans_profile.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
 	$(CC_CPP) -o $@ $^ $(LFLAGS)
 
-$(BUILD_DIR)/benchmark: $(CPP_OBJ_DIR)/kmeans_benchmark.o $(C_OBJ_DIR)/kmeans.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
-	$(CC_CPP) -o $@ $^ $(LFLAGS)
+$(BUILD_DIR)/benchmark: $(CPP_OBJ_DIR)/kmeans_benchmark.o $(C_OBJ_DIR)/kmeans.o $(C_OBJ_DIR)/kmeans_cuda.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
+	$(CC_CPP) -o $@ $^ $(LFLAGS) -L/usr/local/cuda/lib64 -lcuda -lcudart
 
 $(C_OBJ_DIR)/kmeans_profile.o: $(C_SRC_DIR)/kmeans.c $(C_DEPS) $(CONFIG_DEPS)
 	$(CC_C) -c -o $@ $< $(C_CFLAGS) -DPROFILE
+
+$(C_OBJ_DIR)/%_cuda.o: $(C_SRC_DIR)/%.cu $(C_DEPS) $(CONFIG_DEPS)
+	$(CC_CUDA) -c -o $@ $< $(CUDA_CFLAGS)
 
 $(C_OBJ_DIR)/%.o: $(C_SRC_DIR)/%.c $(C_DEPS) $(CONFIG_DEPS)
 	$(CC_C) -c -o $@ $< $(C_CFLAGS)

@@ -39,9 +39,9 @@ static inline size_t find_closest_centroid(
     return closest_centroid;
 }
 
-void kmeans(struct pixel *pixels, size_t n_pixels,
-            struct pixel *centroids, size_t n_centroids,
-            size_t *labels)
+void kmeans_c(struct pixel *pixels, size_t n_pixels,
+              struct pixel *centroids, size_t n_centroids,
+              size_t *labels)
 {
 #ifdef PROFILE
     clock_t exec_begin;
