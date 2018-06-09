@@ -1,4 +1,5 @@
-# directories
+# directories ##################################################################
+
 C_SRC_DIR=c/src
 C_OBJ_DIR=c/obj
 C_INCLUDE_DIR=c/include
@@ -17,41 +18,11 @@ REPORT_PDF_DIR=$(REPORT_DIR)/pdf
 REPORT_RESOURCE_DIR=$(REPORT_DIR)/resources
 REPORT_TEX_DIR=$(REPORT_DIR)/tex
 
-# files
-_CONFIG_DEPS=kmeans_config.h
-CONFIG_DEPS=$(patsubst %, $(CONFIG_DIR)/%, $(_CONFIG_DEPS))
+# parameters ###################################################################
 
-_C_DEPS=kmeans.h
-C_DEPS=$(patsubst %, $(C_INCLUDE_DIR)/%, $(_C_DEPS))
-
-_CPP_DEPS=kmeans_wrapper.h
-CPP_DEPS=$(patsubst %, $(CPP_INCLUDE_DIR)/%, $(_CPP_DEPS))
-
-DEPS=$(CONFIG_DEPS) $(C_DEPS) $(CPP_DEPS)
-
-# compilation settings
-CC_C=gcc-8
-CC_CUDA=nvcc
-CC_CPP=g++
-
-COMMON_CFLAGS=-Wall -g -O0 -fopenmp
-
-C_CFLAGS=-std=c99 $(COMMON_CFLAGS) -I$(CONFIG_DIR) -I$(C_INCLUDE_DIR)
-CPP_CFLAGS=-std=c++11 $(COMMON_CFLAGS) -I$(CONFIG_DIR) -I$(C_INCLUDE_DIR) -I$(CPP_INCLUDE_DIR) `pkg-config --cflags opencv`
-CUDA_CFLAGS=-I$(CONFIG_DIR) -I$(C_INCLUDE_DIR)
-
-LFLAGS=`pkg-config --libs opencv` -fopenmp
-
-#functions
-define run_pdflatex
-	pdflatex -halt-on-error -shell-escape -output-directory $(REPORT_AUX_DIR) $< > /dev/null
-endef
-
-# profiling parameters
 PROFILE_IMAGE=$(IMAGE_DIR)/profile_image.jpg
 PROFILE_CLUSTERS=5
 
-# benchmark parameters
 BENCHMARK_DIM_MIN=10
 BENCHMARK_DIM_MAX=100
 BENCHMARK_DIM_STEP=10
@@ -61,33 +32,64 @@ BENCHMARK_CLUSTER_STEP=1
 BENCHMARK_N_EXEC=100
 BENCHMARK_PLOT=tool/plot.py
 
-# demo parameters
 DEMO_IMAGE=$(IMAGE_DIR)/demo_image.jpg
 DEMO_CLUSTERS=5
 
-# rules
+# compilation settings #########################################################
+
+CC_C=gcc-8
+CC_CUDA=nvcc
+CC_CPP=g++
+
+C_CFLAGS=-std=c99 -Wall -g -O3 -I$(C_INCLUDE_DIR) -I$(CONFIG_DIR) -fopenmp
+CPP_CFLAGS=-std=c++11 -Wall -g -O0 -I$(CONFIG_DIR) -I$(C_INCLUDE_DIR) \
+           -I$(CPP_INCLUDE_DIR) `pkg-config --cflags opencv`
+CUDA_CFLAGS=-I$(CONFIG_DIR) -I$(C_INCLUDE_DIR)
+
+LCV=`pkg-config --libs opencv`
+LOMP=-fopenmp
+LCUDA=-L/usr/local/cuda/lib64 -lcudart
+
+# build sources ################################################################
+
 all: $(BUILD_DIR)/demo $(BUILD_DIR)/profile $(BUILD_DIR)/benchmark
 
-$(BUILD_DIR)/demo: $(CPP_OBJ_DIR)/kmeans_demo.o $(C_OBJ_DIR)/kmeans.o $(C_OBJ_DIR)/kmeans_cuda.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
-	$(CC_CPP) -o $@ $^ $(LFLAGS) -L/usr/local/cuda/lib64 -lcuda -lcudart
+$(BUILD_DIR)/demo: $(CPP_OBJ_DIR)/kmeans_demo.o \
+ $(C_OBJ_DIR)/kmeans.o $(C_OBJ_DIR)/kmeans_cuda.o \
+ $(CPP_OBJ_DIR)/kmeans_wrapper.o
+	$(CC_CPP) -o $@ $^ $(LCV) $(LOMP) $(LCUDA)
 
-$(BUILD_DIR)/profile: $(CPP_OBJ_DIR)/kmeans_profile.o $(C_OBJ_DIR)/kmeans_profile.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
-	$(CC_CPP) -o $@ $^ $(LFLAGS)
+$(BUILD_DIR)/profile: $(CPP_OBJ_DIR)/kmeans_profile.o \
+  $(C_OBJ_DIR)/kmeans_profile.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
+	$(CC_CPP) -o $@ $^ $(LCV) $(LOMP)
 
-$(BUILD_DIR)/benchmark: $(CPP_OBJ_DIR)/kmeans_benchmark.o $(C_OBJ_DIR)/kmeans.o $(C_OBJ_DIR)/kmeans_cuda.o $(CPP_OBJ_DIR)/kmeans_wrapper.o
-	$(CC_CPP) -o $@ $^ $(LFLAGS) -L/usr/local/cuda/lib64 -lcuda -lcudart
+$(BUILD_DIR)/benchmark: $(CPP_OBJ_DIR)/kmeans_benchmark.o \
+  $(C_OBJ_DIR)/kmeans.o $(C_OBJ_DIR)/kmeans_cuda.o \
+  $(CPP_OBJ_DIR)/kmeans_wrapper.o
+	$(CC_CPP) -o $@ $^ $(LCV) $(LOMP) $(LCUDA)
 
-$(C_OBJ_DIR)/kmeans_profile.o: $(C_SRC_DIR)/kmeans.c $(C_DEPS) $(CONFIG_DEPS)
-	$(CC_C) -c -o $@ $< $(C_CFLAGS) -DPROFILE
-
-$(C_OBJ_DIR)/%_cuda.o: $(C_SRC_DIR)/%.cu $(C_DEPS) $(CONFIG_DEPS)
+$(C_OBJ_DIR)/kmeans_cuda.o: $(C_SRC_DIR)/kmeans.cu \
+  $(C_INCLUDE_DIR)/kmeans.h $(CONFIG_DIR)/kmeans_config.h
 	$(CC_CUDA) -c -o $@ $< $(CUDA_CFLAGS)
 
-$(C_OBJ_DIR)/%.o: $(C_SRC_DIR)/%.c $(C_DEPS) $(CONFIG_DEPS)
+$(C_OBJ_DIR)/kmeans_profile.o: $(C_SRC_DIR)/kmeans.c \
+  $(C_INCLUDE_DIR)/kmeans.h $(CONFIG_DIR)/kmeans_config.h
+	$(CC_C) -c -o $@ $< $(C_CFLAGS) -DPROFILE
+
+$(C_OBJ_DIR)/%.o: $(C_SRC_DIR)/%.c \
+  $(C_INCLUDE_DIR)/kmeans.h $(CONFIG_DIR)/kmeans_config.h
 	$(CC_C) -c -o $@ $< $(C_CFLAGS)
 
-$(CPP_OBJ_DIR)/%.o: $(CPP_SRC_DIR)/%.cc $(DEPS)
+$(CPP_OBJ_DIR)/%.o: $(CPP_SRC_DIR)/%.cc \
+  $(C_INCLUDE_DIR)/kmeans.h $(CONFIG_DIR)/kmeans_config.h \
+  $(CPP_INCLUDE_DIR)/kmeans_wrapper.h
 	$(CC_CPP) -c -o $@ $< $(CPP_CFLAGS)
+
+# build report #################################################################
+
+define run_pdflatex
+  pdflatex -halt-on-error -shell-escape -output-directory $(REPORT_AUX_DIR) $< > /dev/null
+endef
 
 report: $(REPORT_PDF_DIR)/report.pdf
 
@@ -95,6 +97,8 @@ $(REPORT_PDF_DIR)/report.pdf: $(REPORT_TEX_DIR)/report.tex $(REPORT_RESOURCE_DIR
 	$(call run_pdflatex)
 	$(call run_pdflatex)
 	-@mv $(REPORT_AUX_DIR)/report.pdf $(REPORT_PDF_DIR)
+
+# PHONY rules ##################################################################
 
 .PHONY: demo, profile, benchmark, clean
 
