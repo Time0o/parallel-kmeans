@@ -198,10 +198,14 @@ void kmeans_c(struct pixel *pixels, size_t n_pixels,
     }
 #ifdef PROFILE
     printf("Total kernel execution times:\n");
-    printf("Kernel 1 (random centroid initialization): %.3e\n", exec_time_kernel1);
-    printf("Kernel 2 (reassigning points to closest centroids): %.3e\n", exec_time_kernel2);
-    printf("Kernel 3 (repairing empty clusters): %.3e\n", exec_time_kernel3);
-    printf("Kernel 4 (average accumulated centroids): %.3e\n", exec_time_kernel4);
+    printf("Kernel 1 (random centroid initialization): %.3e\n",
+           exec_time_kernel1);
+    printf("Kernel 2 (reassigning points to closest centroids): %.3e\n",
+           exec_time_kernel2);
+    printf("Kernel 3 (repairing empty clusters): %.3e\n",
+           exec_time_kernel3);
+    printf("Kernel 4 (average accumulated centroids): %.3e\n",
+           exec_time_kernel4);
 #endif
 
     free(sums);
