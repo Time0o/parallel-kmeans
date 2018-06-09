@@ -284,19 +284,15 @@ void kmeans_omp(struct pixel *pixels, size_t n_pixels,
 
             size_t furthest_pixel = 0u;
             double max_dist = 0.0;
-            #pragma omp parallel for
             for (size_t j = 0u; j < n_pixels; ++j) {
                 if (labels[j] != largest_cluster)
                     continue;
 
                 double dist = pixel_dist(pixels[j], largest_cluster_centroid);
 
-                #pragma omp critical
-                {
-                    if (dist > max_dist) {
-                        furthest_pixel = j;
-                        max_dist = dist;
-                    }
+                if (dist > max_dist) {
+                    furthest_pixel = j;
+                    max_dist = dist;
                 }
             }
 
