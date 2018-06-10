@@ -115,8 +115,7 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
     }
 
     // repeat for KMEANS_MAX_ITER or until solution is stationary
-    int iter;
-    for (iter = 0; iter < KMEANS_MAX_ITER; ++iter) {
+    for (int iter = 0; iter < KMEANS_MAX_ITER; ++iter) {
         int *done;
         cudaMallocManaged(&done, sizeof(int));
         *done = 1;
