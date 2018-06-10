@@ -1,5 +1,7 @@
+#include <cassert>
 #include <float.h>
 #include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -8,210 +10,271 @@ extern "C" {
 }
 #include "kmeans_config.h"
 
+/* Helper Functions ***********************************************************/
+
+#define cudaAssert(code, file, line) do {                  \
+  if (code != cudaSuccess) {                               \
+    fprintf(stderr, "A CUDA error occurred: %s (%s:%d)\n", \
+            cudaGetErrorString(code), file, line);         \
+    exit(code);                                            \
+  }                                                        \
+} while(0)
+
+#define cudaCheck(code) do { cudaAssert(code, __FILE__, __LINE__); } while(0)
+
+/* CUDA kernels ***************************************************************/
+
 // reassign points to closest centroids
 __global__
-static void reassign_points(struct pixel *pixels, size_t n_pixels,
-                            struct pixel *centroids, size_t n_centroids,
-                            size_t *labels, struct pixel *sums, size_t *counts,
-                            int *done)
+static void reassign(struct pixel *pixels, size_t n_pixels,
+                     struct pixel *centroids, size_t n_centroids,
+                     size_t *labels, struct pixel *sums, size_t *counts,
+                     int *done)
 {
-  int index = blockIdx.x * blockDim.x * threadIdx.x;
-  int stride = blockDim.x * gridDim.x;
+    // index alias
+    size_t tid = threadIdx.x;
+    size_t bid = blockIdx.x;
 
-  for (int i = index; i < n_pixels; i += stride) {
-      struct pixel pixel = pixels[i];
+    // set up shared and global memory
+    extern __shared__ char shared[];
 
-      // find centroid closest to pixel
-      size_t closest_centroid = 0u;
-      double min_dist = DBL_MAX;
+    struct pixel *shared_pixels = (struct pixel *) shared;
 
-      for (size_t j = 0; j < n_centroids; ++j) {
-          struct pixel centroid = centroids[j];
+    size_t shared_counts_offs = blockDim.x * sizeof(struct pixel);
+    shared_counts_offs += sizeof(size_t) - sizeof(struct pixel) % sizeof(size_t);
 
-          double dr = pixel.r - centroid.r;
-          double dg = pixel.g - centroid.g;
-          double db = pixel.b - centroid.b;
+    size_t *shared_counts = (size_t *) &shared[shared_counts_offs];
 
-          double dist = sqrt(dr * dr + dg * dg + db * db);
+    if (tid < n_centroids) {
+      shared_pixels[tid] = centroids[tid];
 
-          if (dist < min_dist) {
-              closest_centroid = j;
-              min_dist = dist;
-          }
-      }
+      struct pixel tmp = { 0.0, 0.0, 0.0 };
+      sums[n_centroids * bid + tid] = tmp;
+      counts[n_centroids * bid + tid] = 0u;
+    }
 
-      // if pixel has changed cluster...
-      if (closest_centroid != labels[i]) {
-          labels[i] = closest_centroid;
+    __syncthreads();
 
-          *done = 0;
-      }
+    // obtain pixel index and stride (less threads than total pixels available)
+    size_t index = bid * blockDim.x + tid;
+    size_t stride = blockDim.x * gridDim.x;
 
-      // update cluster sum
-      struct pixel *sum = &sums[closest_centroid];
-      sum->r += pixel.r;
-      sum->g += pixel.g;
-      sum->b += pixel.b;
+    for (size_t i = index; i < n_pixels; i += stride) {
+        struct pixel *p = &pixels[i];
 
-      // update cluster size
-      counts[closest_centroid]++;
-  }
+        // find centroid closest to pixel
+        size_t closest_centroid = 0u;
+        double min_dist = DBL_MAX;
+
+        for (size_t j = 0u; j < n_centroids; ++j) {
+            struct pixel *c = &shared_pixels[j];
+
+            double dr = p->r - c->r;
+            double dg = p->g - c->g;
+            double db = p->b - c->b;
+
+            double dist = sqrt(dr * dr + dg * dg + db * db);
+
+            if (dist < min_dist) {
+                closest_centroid = j;
+                min_dist = dist;
+            }
+        }
+
+        // if pixel has changed cluster...
+        if (closest_centroid != labels[i]) {
+            labels[i] = closest_centroid;
+
+            *done = 0;
+        }
+
+        // perform cluster wise tree-reduction to obtain cluster sums / counts
+        for (size_t j = 0u; j < n_centroids; ++j) {
+            if (j == closest_centroid) {
+                shared_pixels[tid] = *p;
+                shared_counts[tid] = 1u;
+            } else {
+                struct pixel tmp = { 0.0, 0.0, 0.0 };
+                shared_pixels[tid] = tmp;
+                shared_counts[tid] = 0u;
+            }
+
+            __syncthreads();
+
+            for (size_t dist = blockDim.x >> 1; dist > 0; dist >>= 1) {
+                if (tid < dist) {
+                    struct pixel *shared_sum1 = &shared_pixels[tid];
+                    struct pixel *shared_sum2 = &shared_pixels[tid + dist];
+
+                    shared_sum1->r += shared_sum2->r;
+                    shared_sum1->g += shared_sum2->g;
+                    shared_sum1->b += shared_sum2->b;
+
+                    shared_counts[tid] += shared_counts[tid + dist];
+                }
+
+                __syncthreads();
+            }
+
+            if (tid == 0) {
+                struct pixel *sum = &sums[n_centroids * bid + j];
+                struct pixel *shared_sum = &shared_pixels[0];
+
+                sum->r += shared_sum->r;
+                sum->g += shared_sum->g;
+                sum->b += shared_sum->b;
+
+                counts[n_centroids * bid + j] += shared_counts[0];
+            }
+        }
+    }
 }
 
-// compute euclidean distance between two pixel values
-static inline double pixel_dist(struct pixel p1, struct pixel p2)
+// reduce per-block cluster sums and counts
+__global__
+static void average(size_t n_blocks, struct pixel *centroids, size_t n_centroids,
+                    struct pixel *sums, size_t *counts)
 {
-    double dr = p1.r - p2.r;
-    double dg = p1.g - p2.g;
-    double db = p1.b - p2.b;
+    size_t tid = threadIdx.x;
+    size_t bid = blockIdx.x;
 
-    return sqrt(dr * dr + dg * dg + db * db);
+    size_t index = bid * blockDim.x + tid;
+    size_t stride = blockDim.x * gridDim.x;
+
+    // reduce per-block clusters sums / counts
+    for (size_t dist = (n_blocks * n_centroids) >> 1; dist >= n_centroids; dist >>= 1) {
+        for (size_t i = index; i < dist; i += stride) {
+            struct pixel *sum1 = &sums[i];
+            struct pixel *sum2 = &sums[i + dist];
+
+            sum1->r += sum2->r;
+            sum1->g += sum2->g;
+            sum1->b += sum2->b;
+
+            counts[i] += counts[i + dist];
+        }
+        __syncthreads();
+    }
+
+    // compute new centroids
+    for (size_t j = index; j < n_centroids; j += stride) {
+        struct pixel *c = &centroids[j];
+        struct pixel *sum = &sums[j];
+        size_t count = counts[j];
+
+        c->r = sum->r / count;
+        c->g = sum->g / count;
+        c->b = sum->b / count;
+    }
 }
+
+/* Main Function **************************************************************/
 
 extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
                             struct pixel *centroids, size_t n_centroids,
                             size_t *labels)
 {
     // number of blocks to be used on device
-    int blocks = (n_pixels + KMEANS_CUDA_BLOCKSIZE - 1) / KMEANS_CUDA_BLOCKSIZE;
+    size_t n_blocks_reassign =
+        (n_pixels + KMEANS_CUDA_BLOCKSIZE - 1) / KMEANS_CUDA_BLOCKSIZE;
+
+    size_t n_blocks_reduce =
+        (((n_centroids * n_blocks_reassign) >> 1) + KMEANS_CUDA_BLOCKSIZE - 1) /
+        KMEANS_CUDA_BLOCKSIZE;
+
+    // reassignment step shared memory size
+    size_t shm_slots =
+        n_centroids > KMEANS_CUDA_BLOCKSIZE ? n_centroids : KMEANS_CUDA_BLOCKSIZE;
+
+    size_t shm_reassign = shm_slots * (sizeof(struct pixel) + sizeof(size_t));
+    shm_reassign += sizeof(size_t) - sizeof(struct pixel) % sizeof(size_t);
+
+    // initialize centroids with random pixels
+    srand(time(NULL));
+
+    for (size_t i = 0u; i < n_centroids; ++i)
+        centroids[i] = pixels[rand() % n_pixels];
 
     // initialize device memory
     struct pixel *pixels_dev;
     struct pixel *centroids_dev;
     size_t *labels_dev;
 
-    cudaMalloc(&pixels_dev, n_pixels * sizeof(struct pixel));
-    cudaMalloc(&centroids_dev, n_centroids * sizeof(struct pixel));
-    cudaMalloc(&labels_dev, n_pixels * sizeof(size_t));
+    cudaCheck(cudaMalloc(&pixels_dev, n_pixels * sizeof(struct pixel)));
+    cudaCheck(cudaMalloc(&centroids_dev, n_centroids * sizeof(struct pixel)));
+    cudaCheck(cudaMalloc(&labels_dev, n_pixels * sizeof(size_t)));
 
-    cudaMemcpy(pixels_dev, pixels, n_pixels * sizeof(struct pixel),
-               cudaMemcpyHostToDevice);
-    cudaMemcpy(centroids_dev, centroids, n_centroids * sizeof(struct pixel),
-               cudaMemcpyHostToDevice);
-    cudaMemcpy(labels_dev, labels, n_pixels * sizeof(size_t),
-               cudaMemcpyHostToDevice);
+    cudaCheck(cudaMemcpy(pixels_dev, pixels, n_pixels * sizeof(struct pixel),
+                         cudaMemcpyHostToDevice));
 
-    // seed rand
-    srand(time(NULL));
+    cudaCheck(cudaMemcpy(centroids_dev, centroids, n_centroids * sizeof(struct pixel),
+                         cudaMemcpyHostToDevice));
 
-    // allocate auxiliary memory shared between host and device
+    cudaCheck(cudaMemcpy(labels_dev, labels, n_pixels * sizeof(size_t),
+                         cudaMemcpyHostToDevice));
+
+    // allocate and initialize auxiliary memory
     struct pixel *sums, *sums_dev;
     size_t *counts, *counts_dev;
+    int done, *done_dev;
 
-    sums = malloc(n_centroids * sizeof(struct pixel));
-    counts = malloc(n_centroids *  sizeof(size_t));
+    sums = (struct pixel *) malloc(n_centroids * sizeof(struct pixel));
+    counts = (size_t *) malloc(n_centroids *  sizeof(size_t));
 
-    cudaMalloc(&sums_dev, n_centroids * sizeof(struct pixel));
-    cudaMalloc(&counts_dev, n_centroids *  sizeof(size_t));
+    cudaCheck(cudaMalloc(&sums_dev, n_blocks_reassign * n_centroids * sizeof(struct pixel)));
+    cudaCheck(cudaMalloc(&counts_dev, n_blocks_reassign * n_centroids *  sizeof(size_t)));
+    cudaCheck(cudaMalloc(&done_dev, sizeof(int)));
 
-    // randomly initialize centroids
     for (size_t i = 0u; i < n_centroids; ++i) {
-        centroids[i] = pixels[rand() % n_pixels];
-
         struct pixel tmp = { 0.0, 0.0, 0.0 };
         sums[i] = tmp;
-
         counts[i] = 0u;
     }
 
     // repeat for KMEANS_MAX_ITER or until solution is stationary
     for (int iter = 0; iter < KMEANS_MAX_ITER; ++iter) {
-        int *done;
-        cudaMallocManaged(&done, sizeof(int));
-        *done = 1;
+        done = 1;
+
+        cudaCheck(cudaMemcpy(done_dev, &done, sizeof(int),
+                             cudaMemcpyHostToDevice));
 
         // reassign points to closest centroids
-        reassign_points<<<blocks, KMEANS_CUDA_BLOCKSIZE>>>(
+        reassign<<<n_blocks_reassign, KMEANS_CUDA_BLOCKSIZE, shm_reassign>>>(
             pixels_dev, n_pixels, centroids_dev, n_centroids, labels_dev,
-            sums, counts, done);
+            sums_dev, counts_dev, done_dev
+        );
 
-        // repair empty clusters
-        for (size_t i = 0u; i < n_centroids; ++i) {
-            if (counts[i])
-                continue;
+        cudaCheck(cudaPeekAtLastError());
+        cudaCheck(cudaDeviceSynchronize());
 
-            // determine largest cluster
-            size_t largest_cluster = 0u;
-            size_t largest_cluster_count = 0u;
-            for (size_t j = 0u; j < n_centroids; ++j) {
-                if (j == i)
-                    continue;
+        average<<<1, n_centroids>>>(
+            n_blocks_reassign, centroids_dev, n_centroids, sums_dev, counts_dev
+        );
 
-                if (counts[j] > largest_cluster_count) {
-                    largest_cluster = j;
-                    largest_cluster_count = counts[j];
-                }
-            }
-
-            // determine pixel in this cluster furthest from its centroid
-            struct pixel largest_cluster_centroid = centroids[largest_cluster];
-
-            size_t furthest_pixel = 0u;
-            double max_dist = 0.0;
-            for (size_t j = 0u; j < n_pixels; ++j) {
-                if (labels[j] != largest_cluster)
-                    continue;
-
-                double dist = pixel_dist(pixels[j], largest_cluster_centroid);
-
-                if (dist > max_dist) {
-                    furthest_pixel = j;
-                    max_dist = dist;
-                }
-            }
-
-            // move that pixel to the empty cluster
-            struct pixel replacement_pixel = pixels[furthest_pixel];
-            centroids[i] = replacement_pixel;
-            labels[furthest_pixel] = i;
-
-            // correct cluster sums
-            sums[i] = replacement_pixel;
-
-            struct pixel *sum = &sums[largest_cluster];
-            sum->r -= replacement_pixel.r;
-            sum->g -= replacement_pixel.g;
-            sum->b -= replacement_pixel.b;
-
-            // correct cluster sizes
-            counts[i] = 1u;
-            counts[largest_cluster]--;
-        }
-
-        // average accumulated cluster sums
-        for (int j = 0; j < n_centroids; ++j) {
-            struct pixel *centroid = &centroids[j];
-            struct pixel *sum = &sums[j];
-            size_t count = counts[j];
-
-            centroid->r = sum->r / count;
-            centroid->g = sum->g / count;
-            centroid->b = sum->b / count;
-
-            sum->r = 0.0;
-            sum->g = 0.0;
-            sum->b = 0.0;
-
-            counts[j] = 0u;
-        }
+        cudaCheck(cudaPeekAtLastError());
+        cudaCheck(cudaMemcpy(&done, done_dev, sizeof(int),
+                             cudaMemcpyDeviceToHost));
 
         // break if no pixel has changed cluster
-        if (*done)
+        if (done)
             break;
     }
 
     // copy device memory back to host
-    cudaMemcpy(pixels, pixels_dev, n_pixels * sizeof(struct pixel),
-               cudaMemcpyDeviceToHost);
-    cudaMemcpy(centroids, centroids_dev, n_centroids * sizeof(struct pixel),
-               cudaMemcpyDeviceToHost);
-    cudaMemcpy(labels, labels_dev, n_pixels * sizeof(size_t),
-               cudaMemcpyDeviceToHost);
+    cudaCheck(cudaMemcpy(pixels, pixels_dev, n_pixels * sizeof(struct pixel),
+                         cudaMemcpyDeviceToHost));
+    cudaCheck(cudaMemcpy(centroids, centroids_dev, n_centroids * sizeof(struct pixel),
+                         cudaMemcpyDeviceToHost));
+    cudaCheck(cudaMemcpy(labels, labels_dev, n_pixels * sizeof(size_t),
+                         cudaMemcpyDeviceToHost));
 
     // free host and device memory
-    cudaFree(pixels_dev);
-    cudaFree(centroids_dev);
-    cudaFree(labels_dev);
-    cudaFree(sums);
-    cudaFree(counts);
+    free(sums);
+    free(counts);
+
+    cudaCheck(cudaFree(pixels_dev));
+    cudaCheck(cudaFree(centroids_dev));
+    cudaCheck(cudaFree(labels_dev));
+    cudaCheck(cudaFree(sums_dev));
+    cudaCheck(cudaFree(counts_dev));
 }
