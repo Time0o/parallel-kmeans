@@ -95,11 +95,14 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
     srand(time(NULL));
 
     // allocate auxiliary memory shared between host and device
-    struct pixel *sums;
-    size_t *counts;
+    struct pixel *sums, *sums_dev;
+    size_t *counts, *counts_dev;
 
-    cudaMallocManaged(&sums, n_centroids * sizeof(struct pixel));
-    cudaMallocManaged(&counts, n_centroids *  sizeof(size_t));
+    sums = malloc(n_centroids * sizeof(struct pixel));
+    counts = malloc(n_centroids *  sizeof(size_t));
+
+    cudaMalloc(&sums_dev, n_centroids * sizeof(struct pixel));
+    cudaMalloc(&counts_dev, n_centroids *  sizeof(size_t));
 
     // randomly initialize centroids
     for (size_t i = 0u; i < n_centroids; ++i) {
@@ -122,8 +125,6 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
         reassign_points<<<blocks, KMEANS_CUDA_BLOCKSIZE>>>(
             pixels_dev, n_pixels, centroids_dev, n_centroids, labels_dev,
             sums, counts, done);
-
-        cudaDeviceSynchronize();
 
         // repair empty clusters
         for (size_t i = 0u; i < n_centroids; ++i) {

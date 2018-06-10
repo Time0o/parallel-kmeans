@@ -6,7 +6,6 @@
 
 #include <opencv2/opencv.hpp>
 
-#include "kmeans_config.h"
 #include "kmeans_wrapper.h"
 
 int main(int argc, char **argv)
