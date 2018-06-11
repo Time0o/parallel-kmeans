@@ -37,7 +37,7 @@ DEMO_CLUSTERS=5
 
 # compilation settings #########################################################
 
-CC_C=gcc-8
+CC_C=gcc
 CC_CUDA=nvcc
 CC_CPP=g++
 
