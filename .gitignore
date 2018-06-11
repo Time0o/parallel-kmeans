@@ -1,7 +1,5 @@
 *.swp
 _minted-report/
-benchmarks/*
-!benchmarks/.gitkeep
 build/*
 !build/.gitkeep
 c/obj/*
