@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     try {
         cv::waitKey(0);
         cv::destroyWindow(disp_title);
-    } catch (cv::Exception e) {
+    } catch (cv::Exception const &e) {
         // demo window was closed externally
     }
 
