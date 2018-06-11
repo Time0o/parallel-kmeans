@@ -178,7 +178,7 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
     size_t n_blocks_reassign =
         (n_pixels + KMEANS_CUDA_BLOCKSIZE - 1) / KMEANS_CUDA_BLOCKSIZE;
 
-    size_t n_blocks_reduce =
+    size_t n_blocks_average =
         (((n_centroids * n_blocks_reassign) >> 1) + KMEANS_CUDA_BLOCKSIZE - 1) /
         KMEANS_CUDA_BLOCKSIZE;
 
@@ -247,7 +247,7 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
         cudaCheck(cudaPeekAtLastError());
         cudaCheck(cudaDeviceSynchronize());
 
-        average<<<1, n_centroids>>>(
+        average<<<n_blocks_average, KMEANS_CUDA_BLOCKSIZE>>>(
             n_blocks_reassign, centroids_dev, n_centroids, sums_dev, counts_dev
         );
 
