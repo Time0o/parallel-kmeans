@@ -62,12 +62,12 @@ Dieser Beleg beschreibt die Implementierung von Lloyds k-means
 Vektorquantisierungs-Algorithmus sowohl in serieller als auch parallelisierter
 Form.
 
-Die Parallelisierung wurde zum einen durch parallele Nutzung mehrerer CPU-Kerne
-mittels \texttt{OpenMP} Quellcode-Annotationen und zum anderen durch
-Auslagerung parallelisierbarer Performance-kritischer Abschnitte auf eine
+Die Parallelisierung wurde zum einen durch parallele Nutzung mehrerer
+Prozessor-Kerne mittels \texttt{OpenMP} Quellcode-Annotationen und zum anderen
+durch Auslagerung parallelisierbarer Performance-kritischer Abschnitte auf eine
 \texttt{NVIDIA}-GPU mittels \texttt{CUDA} erreicht. Beide Methoden werden im
 Folgenden mit Hinblick auf Besonderheiten in der Implementierung und
-Performance-Gewinnen in Abhängigkeit der Problem-Größe und genutzten
+Performance-Gewinnen in Abhängigkeit der Problemgröße und genutzten
 Hardware-Ressourcen mit der seriellen Implementierung gegenübergestellt.
 
 \chapter{Der k-means Algorithmus}
@@ -139,14 +139,10 @@ Partitionen nach der Schleife in den Zeilen \ref{alg:cluster_begin} bis
 ``vernünftigen'' Implementierung für die meisten Inputs eher die Ausnahme als
 die Regel darstellen, muss aber trotzdem berücksichtigt werden um die
 Korrektheit des Algorithmus zu garantieren. Der in den folgenden
-Implementierungen gewählte Ansatz ist es, iterativ alle leeren Partitionen mit
-dem Vektor aus der jeweils momentan größten Partition, der von deren
-die Regel darstellen, muss aber trotzdem berücksichtigt werden um die Korrektheit
-des Algorithmus zu garantieren. Der in den folgenden Implementierungen gewählte
+Implementierungen (mit Ausnahme der \texttt{CUDA C} Implementierung) gewählte
 Ansatz ist es, iterativ alle leeren Partitionen mit dem Vektor aus der jeweils
 momentan größten Partition, der von deren Schwerpunkt am weitesten entfernt
 ist, zu füllen.
-Schwerpunkt am weitesten entfernt ist, zu füllen.
 
 Der Algorithmus wie er hier dargestellt ist, kann auf Mengen von Vektoren
 beliebiger Dimensionen angewandt werden. Im Folgenden wird allerdings nur noch
@@ -185,16 +181,16 @@ zugeteilt wurde ersetzt und anschließend das zweidimensionale Bild
 rekonstruiert werden.
 
 In den Zeilen 61-68 findet die zufällige Initialisierung der
-Partitions-Schwerpunkte statt. Die Hauptschleife in den Zeilen 71-190 iteriert
+Partitions-Schwerpunkte statt. Die Hauptschleife in den Zeilen 71-192 iteriert
 solange, bis keine Neuverteilung von Pixeln auf Partitionen mehr stattfindet
 oder \texttt{KMEANS\_MAX\_ITER} Iterationen erreicht worden sind. Dabei werden
 in den Zeilen 78-100 alle Pixel den Partitionen mit dem ihnen am nächsten
 liegenden Schwerpunkt zugewiesen. Gleichzeitig werden die Summen aller Pixel in
 jeder Partition im Array \texttt{sums} und die Größen der Partitionen im Array
-\texttt{counts} festgehalten. In den Zeilen 109-159 wird die (verhältnismäßig
+\texttt{counts} festgehalten. In den Zeilen 109-161 wird die (verhältnismäßig
 aufwändige aber in den meisten Anwendungsfällen selten auftretende)
 Umverteilung von Pixeln auf eventuell leer gebliebene Partitionen vorgenommen.
-In Zeilen 168-182 werden die neuen Schwerpunkte über die in \texttt{sums} und
+In Zeilen 170-184 werden die neuen Schwerpunkte über die in \texttt{sums} und
 \texttt{counts} gepeicherten Werte berechnet.
 
 \subsection{Profiling}
@@ -227,75 +223,86 @@ irrelevant.
 
 \subsection{Implementierung}
 
-Listing~\ref{lst:kmeansomp} zeigt die mittels OpenMP parallelisierte Variante
-der in Listing~\ref{lst:kmeansc} gezeigten C-Implementierung. Modifizierte
-Zeilen sind farbig hervorgehoben. Es mussten nur einige wenige Änderungen
-vorgenommen werden um eine performante Parallelisierung zu erreichen. Hier
-zeigt sich eine große Stärke von OpenMP: existierender Code kann teilweise
-(fast) ohne Änderungen am Code selbst nur durch die Nutzung von
+Listing~\ref{lst:kmeansomp} zeigt die mittels \texttt{OpenMP} parallelisierte
+Variante der in Listing~\ref{lst:kmeansc} gezeigten C-Implementierung.
+Modifizierte Zeilen sind farbig hervorgehoben. Es mussten nur einige wenige
+Änderungen vorgenommen werden um eine performante Parallelisierung zu
+erreichen. Hier zeigt sich eine große Stärke von OpenMP: existierender Code
+kann teilweise (fast) ohne Änderungen am Code selbst nur durch die Nutzung von
 \texttt{\#pragma} Direktiven parallelisiert werden.  Natürlich muss für
 maximale Ausnutzung der dem Algorithmus inhärenten Parallelisierbarkeit eine
-günstige Code-Struktur vorliegen. Dies ist hier aber prinzipiell schon
-gegeben, da die Performance-kritische Schleife in Zeilen 78-100 in
-Listing~\ref{lst:kmeansc} bereits in geigneter Form vorliegt.
-Hier können die Berechnungen für jedes Pixel unabhängig voneinander erfolgen,
-es muss lediglich der Zugriff auf die Variable \texttt{done},
-\texttt{sums} und \texttt{counts} synchronisiert werden. Für erstere genügt
-eine \texttt{\#pragma atomic write} Direktive, für die beiden Arrays kann die
-\texttt{reduction} Klausel \footnote{Seit OpenMP Version 4.5 (z.B. von GCC ab
-Version 6.1 unterstützt) auf Arrays anwendbar.} genutzt werden. Hierfür muss
-dann allerdings \texttt{sums} als Array von Fließkommazahlen realisiert werden.
-(jeweils drei aufeinander folgende ersetzen ein \texttt{struct pixel}) da
-Reduktionen nicht auf nutzerdefinierte Typen angewandt werden können.
+günstige Code-Struktur vorliegen. Dies ist hier aber prinzipiell schon gegeben,
+da die Performance-kritische Schleife in Zeilen 78-100 in
+Listing~\ref{lst:kmeansc} bereits in geigneter Form vorliegt.  Hier können die
+Berechnungen für jedes Pixel unabhängig voneinander erfolgen, es muss lediglich
+der Zugriff auf die Variable \texttt{done}, \texttt{sums} und \texttt{counts}
+synchronisiert werden. Für erstere genügt eine \texttt{\#pragma atomic write}
+Direktive, für die beiden Arrays kann die \texttt{reduction} Klausel
+\footnote{Seit OpenMP Version 4.5 (z.B. von GCC ab Version 6.1 unterstützt) auf
+Arrays anwendbar.} genutzt werden. Hierfür muss dann allerdings \texttt{sums}
+als Array von Fließkommazahlen realisiert werden.  (jeweils drei aufeinander
+folgende ersetzen ein \texttt{struct pixel}) da Reduktionen nicht auf
+nutzerdefinierte Typen angewandt werden können.
 
 Andere Abschnitte des Algorithmus können potentiell ebenfall parallelisiert
 werden, allerdings mit vergleichbar kleinem Performance-Gewinn. Bei der
 Reparatur leerer Partitionen wurde ebenfalls über die einzelnen Pixel
 parallelisiert, dieser Codeabschnitt wird jedoch nur selten (wenn überhaupt)
 aufgerufen. Eine Parallelisierung bei Neuberechnung der Schwerpunkte
-hätte für realistische Input-Größen keinen merkbaren Einfluss auf die
-Ausführungszeit des Programms.
+hat für realistische Input-Größen keinen starken Einfluss auf die
+Ausführungszeit des Programms ist hier aber ebenfalls einfach möglich.
 
-\captionof{listing}{Parallelisierte k-means Implementierung mit OpenMP
+\captionof{listing}{Parallelisierte k-means Implementierung mit \texttt{OpenMP}
 (Ausschnitt \texttt{kmeans.c})\label{lst:kmeansomp}}
-\inputminted[firstline=205, label=kmeansomp, highlightlines={
-213, 220-221, 231-232, 249-252, 282, 289-290, 295, 304-307, 309-312, 322,
-325-327, 329}]{C}{c/src/kmeans.c}
+\inputminted[firstline=207, label=kmeansomp, highlightlines={
+215, 222-223, 233-234, 246, 251-254, 286, 293-294, 299, 308-311, 313-316, 324,
+327, 330-332, 334}]{C}{c/src/kmeans.c}
 
 \subsection{Performance}
 
-Abbildung~\ref{img:copenmpboxplot} visualisiert die Ausführungszeiten des
-seriellen sowie des mit OpenMP parallelisierten k-means Algorithmus. Für alle
-auf der horizontalen Achse abgetragenen Bild-Dimensionen wurden beide
+Abbildung~\ref{img:cboxplot} und Abbildung~\ref{img:ompboxplot} visualisieren
+die Ausführungszeiten des seriellen sowie des mit \texttt{OpenMP}
+parallelisierten k-means Algorithmus (hier bei Nutzung aller Prozessor-Kerne).
+
+Für alle auf der horizontalen Achse abgetragenen Bild-Dimensionen wurden beide
 Implementierungen auf je 100 verschiedene, zufällig generierte Farbbilder
 angewandt. Die Programme wurden auf einer Maschine mit einem \texttt{Intel Core
 i5D-4690} Prozessor mit vier Prozessor-Kernen getestet. Die Boxplots lassen
 erkennen, in welchem Bereich sich die Ausführungszeiten jeweils befinden und
-wie groß ihre Streuung ist. Die gestrichtelte Linie verläuft durch die
-Mediane der Ausführungszeiten und zeigt wie zu erwarten in beiden Fällen
-eine lineare Abhängigkeit der Ausführungszeit von der Anzahl der Pixel auf.
+wie groß ihre Streuung ist. Die gestrichtelte Linie verläuft durch die Mediane
+der Ausführungszeiten und zeigt wie zu erwarten in beiden Fällen eine lineare
+Abhängigkeit der Ausführungszeit von der Anzahl der Pixel auf.
 
-Abbildung~\ref{img:copenmpspeedup} zeigt für dieselben Bild-Dimensionen jeweils
-den Median des durch die Nutzung von OpenMP erreichten Speedup. Es lässt sich
-erkennen, dass für angemessene Problemgrößen ein Speedup, der ungefähr im
-Bereich der Anzahl der zur Verfügung stehenden Prozessorkerne \footnote{Jeweils
-mittels \texttt{omp\_set\_num\_threads()} konfiguriert.} liegt, erreicht werden
-konnte. Die Parallelisierung war somit erfolgreich. Gleichzeitig nimmt aber
-auch (wenn man von Ausreißern absieht) bei der Nutzung von mehreren Kernen die
-Schwankung der Ausführungszeiten deutlich stärker mit der Problemgröße zu.
+Abbildung~\ref{img:compspeedup} zeigt für dieselben Bild-Dimensionen jeweils
+den Durchschnitt des durch die Nutzung von \texttt{OpenMP} erreichten Speedup.
+Es lässt sich erkennen, dass für angemessene Problemgrößen ein Speedup, der
+ungefähr im Bereich der Anzahl der zur Verfügung stehenden Prozessorkerne
+\footnote{Jeweils mittels \texttt{omp\_set\_num\_threads()} konfiguriert.},
+wobei der Geschwindigkeitsgewinn mit steigender Prozessoranzahl jedoch immer
+kleiner ausfällt. Gleichzeitig ist bei Nutzung von mehreren Kernen die
+Schwankung der Ausführungszeiten größer.
 
-%\begin{figure}[htbp]
-%  \centering
-%    \includesvg[width=0.8\textwidth]{report/resources/C_OpenMP_boxplots}
-%  \caption{Performance-Vergleich C vs. C + OpenMP}
-%  \label{img:copenmpboxplot}
-%\end{figure}
+\begin{figure}[htbp]
+  \centering
+    \includesvg[width=0.8\textwidth]{report/resources/C_boxplot}
+  \caption{Serielle C Implementierung - Ausführungszeiten \\
+           (je 100 Datenpunkte pro Bild-Dimension)}
+  \label{img:cboxplot}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
+    \includesvg[width=0.8\textwidth]{report/resources/OpenMP_quad_boxplot}
+  \caption{Parallelisierte OpenMP Implementierung - Ausführungszeiten \\
+           (vier Prozessorkerne, je 100 Datenpunkte pro Bild-Dimension)}
+  \label{img:ompboxplot}
+\end{figure}
 
 \begin{figure}[htbp]
   \centering
     \includesvg[width=0.8\textwidth]{report/resources/C_OMP_speedup}
   \caption{Speedup C vs. C + OpenMP}
-  \label{img:copenmpspeedup}
+  \label{img:compspeedup}
 \end{figure}
 
 \section{CUDA}
@@ -314,7 +321,8 @@ Threads ausgeführt werden können, die Implementierung nutzt jedoch eine
 konstante Zahl von Threads und wählt die Zahl der Blöcke sinnvoll in
 Abhängigkeit der Größe des Input Pixel-Arrays.
 
-\captionof{listing}{Parallelisierte k-means Implementierung mit CUDA (kmean.cu)
+\captionof{listing}{%
+Parallelisierte k-means Implementierung mit \texttt{CUDA} (kmean.cu)
 \label{lst:kmeanscuda}}
 \inputminted[label=kmeanscuda]{CUDA}{c/src/kmeans.cu}
 
@@ -324,6 +332,7 @@ mit \texttt{OpenMP} realisierten. Problematisch ist hier nur, dass
 Reduktion von Arrays bietet. Diese musste dementsprechend in
 den \texttt{reassign} und \texttt{average} Kerneln explizit implementiert
 werden.
+
 Der \texttt{reassign} Kernel lädt zunächst in Zeile 49 die Schwerpunkte in ein
 \texttt{shared memory} Segment, um den wiederholten lesenden Zugriff aller
 Threads in diesem Block auf die Schwerpunkte zu beschleunigen. In den Zeilen
@@ -447,18 +456,9 @@ Dieser Ansatz umgeht zwar den Einsatz atomarer Operation und kritischer
 Abschnitte die seriell abgearbeitet werden müssen und damit zu starken
 Performance-Einbußen führen, resultiert aber trotzdem durch die vielen
 benötigten Thread-Synchronisations-Punkte nicht in einer optimalen GPU
-Auslastung. Mit \texttt{NVIDIA Nsight} lässt sich die Signifikanz
-synchronisationsbedingter Stalls wie in Abbildung~\ref{fig:stallreasons}
-gezeigt visualisieren.
-
-\begin{figure}[htbp]
-  \begin{center}
-    \includegraphics[width=0.6\textwidth,keepaspectratio]{%
-    report/resources/stall_reasons.png}
-  \end{center}
-  \caption{Instruction Stall Ursachen (anteilig)}
-  \label{fig:stallreasons}
-\end{figure}
+Auslastung. Mit \texttt{NVIDIA Nsight} lässt sich ermitteln, dass rund die
+Hälfte aller auftretenden Instruction Stalls durch Thread-Synchronisation
+bedingt sind.
 
 Außerdem limitiert der relativ hohe Shared Memory Bedarf zu Beginn
 jedes Reduktionsschrittes die Anzahl parallel ausführbarer Warps pro Streaming
@@ -510,7 +510,7 @@ Implementierungen gegenüberstellt.
 
 \begin{figure}[htbp]
   \centering
-    \includesvg[width=0.8\textwidth]{%
+    \includesvg[width=\textwidth]{%
     report/resources/All_plot.png}
   \caption{Übersichts-Vergleich Ausführungszeiten (Median aus je 100 Testläufen)}
   \label{fig:all}
@@ -521,7 +521,7 @@ Implementierungen gegenüberstellt.
 Eine Anmerkung zu Beginn: Während der Entwicklung der
 \texttt{CUDA}-Implementierung kam es zu mehreren Zeitpunkten zu
 Programm-Fehlschlägen die durch Treiber-Probleme hervorgerufen wurden. Sollte
-z.B. das \texttt{demo}-Programm mit einem durch CUDA hervorgerufenen
+z.B. das \texttt{demo}-Programm mit einem durch \texttt{CUDA} hervorgerufenen
 \texttt{unknown error} abstürzen hilft unter Umständen ein Neustart oder im
 schlimmsten Fall eine Neuinstallation des \texttt{NVIDIA}-Treibers (mittels des
 \texttt{CUDA-9.2}-Installers ab.
