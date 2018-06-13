@@ -321,6 +321,7 @@ void kmeans_omp(struct pixel *pixels, size_t n_pixels,
         }
 
         // average accumulated cluster sums
+        #pragma omp parallel for
         for (int j = 0; j < n_centroids; ++j) {
             struct pixel *centroid = &centroids[j];
             double *sum = &sums[3 * j];
