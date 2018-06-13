@@ -1,0 +1,3 @@
+Kernel 1 (reassigning points to closest centroids): 4.809e-03
+Kernel 2 (repairing empty clusters): 1.000e-06
+Kernel 3 (average accumulated centroids): 1.000e-06
