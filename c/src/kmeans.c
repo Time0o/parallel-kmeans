@@ -110,6 +110,8 @@ void kmeans_c(struct pixel *pixels, size_t n_pixels,
             if (counts[i])
                 continue;
 
+            done = 0;
+
             // determine largest cluster
             size_t largest_cluster = 0u;
             size_t largest_cluster_count = 0u;
@@ -259,6 +261,8 @@ void kmeans_omp(struct pixel *pixels, size_t n_pixels,
         for (size_t i = 0u; i < n_centroids; ++i) {
             if (counts[i])
                 continue;
+
+            done = 0;
 
             // determine largest cluster
             size_t largest_cluster = 0u;

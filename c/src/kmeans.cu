@@ -302,6 +302,8 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
                 if (!empty[j])
                     continue;
 
+                done = 0;
+
                 repair<<<1, 1>>>(n_blocks_reassign, n_centroids,
                                  sums_dev, counts_dev, empty_dev);
                 break;
