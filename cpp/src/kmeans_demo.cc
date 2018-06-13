@@ -69,14 +69,14 @@ int main(int argc, char **argv)
         KmeansWrapper *wrapper = std::get<1>(pane);
         wrapper->exec(image, n_clusters);
         cv::Mat result = wrapper->get_result();
-        double exec_time = wrapper->get_exec_time();
+        //double exec_time = wrapper->get_exec_time();
 
         result.copyTo(win_mat(cv::Rect(offs, 0, image.cols, image.rows)));
 
         // construct subtitles
         std::ostringstream subtext;
-        subtext << title << " (" << std::setprecision(2) << exec_time
-                             << " sec.)";
+        subtext << title; //<< " (" << std::setprecision(2) << exec_time
+                          //    << " sec.)";
 
         cv::putText(win_mat, subtext.str(),
                     cvPoint(offs + margin, image.rows + 30),
