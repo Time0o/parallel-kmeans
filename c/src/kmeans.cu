@@ -50,6 +50,7 @@ static void reassign(struct pixel *pixels, size_t n_pixels,
 
       struct pixel tmp = { 0.0, 0.0, 0.0 };
       sums[n_centroids * bid + tid] = tmp;
+
       counts[n_centroids * bid + tid] = 0u;
     }
 
@@ -228,6 +229,7 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
     for (size_t i = 0u; i < n_centroids; ++i) {
         struct pixel tmp = { 0.0, 0.0, 0.0 };
         sums[i] = tmp;
+
         counts[i] = 0u;
     }
 
