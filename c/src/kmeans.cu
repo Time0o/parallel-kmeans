@@ -174,7 +174,9 @@ static void average(size_t n_blocks, struct pixel *centroids, size_t n_centroids
     size_t stride = blockDim.x * gridDim.x;
 
     // reduce per-block clusters sums / counts
-    for (size_t dist = (n_blocks * n_centroids) >> 1; dist >= n_centroids; dist >>= 1) {
+    for (size_t dist = (n_blocks * n_centroids) >> 1;
+         dist >= n_centroids; dist >>= 1) {
+
         for (size_t i = index; i < dist; i += stride) {
             struct pixel *sum1 = &sums[i];
             struct pixel *sum2 = &sums[i + dist];
@@ -215,8 +217,8 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
         KMEANS_CUDA_BLOCKSIZE;
 
     // reassignment step shared memory size
-    size_t shm_slots =
-        n_centroids > KMEANS_CUDA_BLOCKSIZE ? n_centroids : KMEANS_CUDA_BLOCKSIZE;
+    size_t shm_slots = n_centroids > KMEANS_CUDA_BLOCKSIZE ?
+                       n_centroids : KMEANS_CUDA_BLOCKSIZE;
 
     size_t shm_reassign = shm_slots * (sizeof(struct pixel) + sizeof(size_t));
     shm_reassign += sizeof(size_t) - sizeof(struct pixel) % sizeof(size_t);
@@ -239,7 +241,8 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
     cudaCheck(cudaMemcpy(pixels_dev, pixels, n_pixels * sizeof(struct pixel),
                          cudaMemcpyHostToDevice));
 
-    cudaCheck(cudaMemcpy(centroids_dev, centroids, n_centroids * sizeof(struct pixel),
+    cudaCheck(cudaMemcpy(centroids_dev, centroids,
+                         n_centroids * sizeof(struct pixel),
                          cudaMemcpyHostToDevice));
 
     cudaCheck(cudaMemcpy(labels_dev, labels, n_pixels * sizeof(size_t),
@@ -255,8 +258,10 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
     counts = (size_t *) malloc(n_centroids *  sizeof(size_t));
     empty = (int *) malloc(n_centroids *  sizeof(int));
 
-    cudaCheck(cudaMalloc(&sums_dev, n_blocks_reassign * n_centroids * sizeof(struct pixel)));
-    cudaCheck(cudaMalloc(&counts_dev, n_blocks_reassign * n_centroids *  sizeof(size_t)));
+    cudaCheck(cudaMalloc(&sums_dev,
+        n_blocks_reassign * n_centroids * sizeof(struct pixel)));
+    cudaCheck(cudaMalloc(&counts_dev,
+        n_blocks_reassign * n_centroids *  sizeof(size_t)));
     cudaCheck(cudaMalloc(&empty_dev, n_centroids * sizeof(int)));
     cudaCheck(cudaMalloc(&done_dev, sizeof(int)));
 
@@ -318,8 +323,11 @@ extern "C" void kmeans_cuda(struct pixel *pixels, size_t n_pixels,
     // copy device memory back to host
     cudaCheck(cudaMemcpy(pixels, pixels_dev, n_pixels * sizeof(struct pixel),
                          cudaMemcpyDeviceToHost));
-    cudaCheck(cudaMemcpy(centroids, centroids_dev, n_centroids * sizeof(struct pixel),
+
+    cudaCheck(cudaMemcpy(centroids, centroids_dev,
+                         n_centroids * sizeof(struct pixel),
                          cudaMemcpyDeviceToHost));
+
     cudaCheck(cudaMemcpy(labels, labels_dev, n_pixels * sizeof(size_t),
                          cudaMemcpyDeviceToHost));
 
