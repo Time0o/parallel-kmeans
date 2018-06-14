@@ -317,11 +317,7 @@ diese sich deutlich vom reinen C-Code. Die Performance-kritische Zuweisung von
 Pixeln zu Partitionen sowie die Neuberechnung der Schwerpunkte sind mittels auf
 der Grafikkarte (nachfolgend \texttt{Device}) ausgeführten \texttt{Kerneln}
 realisiert (letzterer dient hauptsächlich dazu, unnötiges Übertragen von
-Zwischenergebnissen von Device zu Host zu vermeiden). Beide Kernel sind so
-geschrieben, dass sie prinzipiell mit einer beliebigen Anzahl von Blöcken und
-Threads ausgeführt werden können, die Implementierung nutzt jedoch eine
-konstante Zahl von Threads und wählt die Zahl der Blöcke sinnvoll in
-Abhängigkeit der Größe des Input Pixel-Arrays.
+Zwischenergebnissen von Device zu Host zu vermeiden).
 
 \captionof{listing}{%
 Parallelisierte k-means Implementierung mit \texttt{CUDA} (kmean.cu)
@@ -330,7 +326,7 @@ Parallelisierte k-means Implementierung mit \texttt{CUDA} (kmean.cu)
 
 Die Parallelisierung ist hier von der Struktur her sehr ähnlich zu der bereits
 mit \texttt{OpenMP} realisierten. Problematisch ist hier nur, dass
-\texttt{CUDA} kein zu \texttt{OpenMP} äquivalente Syntax zur automatischen
+\texttt{CUDA} keine zu \texttt{OpenMP} äquivalente Syntax zur automatischen
 Reduktion von Arrays bietet. Diese musste dementsprechend in
 den \texttt{reassign} und \texttt{average} Kerneln explizit implementiert
 werden.
@@ -338,14 +334,15 @@ werden.
 Der \texttt{reassign} Kernel lädt zunächst die Schwerpunkte in ein
 \texttt{shared memory} Segment, um den wiederholten lesenden Zugriff aller
 Threads in diesem Block auf die Schwerpunkte zu beschleunigen. In den Zeilen
-63-89 wird anschließend äquivalent zur \texttt{OpenMP}-Implementierung pro
-Thread der zu einem Pixel nächste Schwerpunkt ermittelt. In Zeile 92 beginnt
+59-90 wird anschließend äquivalent zur \texttt{OpenMP}-Implementierung pro
+Thread der zu einem Pixel nächste Schwerpunkt ermittelt. In Zeile 93 beginnt
 dann die Reduktion welche die \texttt{sums} und \texttt{counts} Arrays
 aktualisiert und die Nutzung kritischer Abschnitte umgeht. Dabei wird der
 gleiche Reduktionsschritt sequentiell auf die einzelnen Partition angewandt.
 Anschließend haben die Bereiche globalen Device-Speichers auf die \texttt{sums}
 bzw. \texttt{counts} (im Kernel, nicht zu verwechseln mit den gleichnamigen
-Host-Zeigern) zeigen folgenden Inhalt:
+Host-Zeigern) zeigen folgenden Inhalt\footnote{Die Gauss-Klammern symbolisieren
+hier ein Aufrunden auf die nächsthöhere Zweierpotenz}:
 
 \vspace{10pt}
 
@@ -385,15 +382,15 @@ Host-Zeigern) zeigen folgenden Inhalt:
 
 D.h. es existiert dann in diesen Speicherbereichen pro Block für den der Kernel
 ausgeführt wurde aneinandergereiht Arrays, deren Dimensionen denen der
-Host-Speicherbereichen auf die die Host-Zeiger \texttt{sums} und
+Host-Speicherbereiche auf die die Host-Zeiger \texttt{sums} und
 \texttt{counts} zeigen entsprechen und die jeweils den Beitrag aller in dem
 jeweiligen Block betrachteten Pixel zu diesen Arrays darstellen.
 
 Die Reduktion erfolgt dabei für beide Arrays in
 $log_2\left(\left|Threads\right|\right)$ Schritten. Zunächst werden in den
-Zeilen 93-101 für jeden Thread genau dann wenn der für den zum Thread gehörigen
+Zeilen 93-101 für jeden Thread genau dann, wenn der für den zum Thread gehörigen
 Pixel bestimmte nächstgelegene Schwerpunkt in der aktuell betrachteten
-Partition liegt dessen Wert und eine eins (für die Bestimmung der
+Partition liegt, dessen Wert und eine eins (für die Bestimmung der
 Partitionsgröße) im \texttt{shared memory} Segment abgelegt.
 
 Anschließend werden diese Werte nach folgendem Schema schrittweise addiert um
@@ -451,19 +448,23 @@ beispielsweise für acht Threads pro Block):
 \vspace{20pt}
 
 Im \texttt{average} Kernel wird die Reduktion schließlich abgeschlossen, indem
-diese Arrays nach dem gleichen Schema in den Zeilen 176-190 blockweise
+diese Arrays nach dem gleichen Schema in der \texttt{\_reduce} Device-Funktion
 aufsummiert werden. Anschließend sind die Partitions-Summen und -Größen
-ermittelt mit deren Hilfe dann in den Zeilen 193-201 die neuen
+ermittelt mit deren Hilfe dann in den Zeilen 180-188 die neuen
 Partitions-Schwerpunkte berechnet werden.
 
-Die Reparatur leerer Partitionen ist ebenfalls mittels Device-Code
-implementiert, allerdings aufgrund der komplizierten Struktur der \texttt{sums}
-und \texttt{counts} Arrays stark vereinfacht. Hier wird ein einzelner Thread
-gestartet, der nacheinander in leere Partition die halbe akkumulierte Summe
-einer anderen Partition überträgt. Dieser Prozess könnte auch auf dem Host
-durchgeführt werden, wobei dann allerdings größerer Datenaustausch zwischen
-Host und Device nötig wäre. Da dieser Abschnitt Performance-unkritisch ist, ist
-die genaue Implementierung hier nicht entscheidend.
+Die Reparatur leerer Partitionen ist in den Zeilen 305-394 komplett mittels
+Host-Code implementiert. Der ansonsten im \texttt{average} Kernel stattfindende
+letzte Teil der Reduktion wird in diesem Fall in einem separaten Kernel
+durchgeführt.  Anschließend erfolgt der zur seriellen Implementierung
+äquivalente Reparatur-Schritt (hierbei müssen auch die Speicherinhalte der
+\texttt{sums} und \texttt{counts} Arrays zu Beginn und Ende zwischen Host und
+Device synchronisiert werden). Da dieser Abschnitt Performance-unkritisch ist,
+ist die genaue Implementierung hier nicht entscheidend und der
+Entwicklungsaufwand der hier für eine Parallelisierung notwendig wäre nicht
+gerechtfertigt. Insbesondere sollte auch der Overhead durch den Launch des
+zusätzlichen Kernels nicht ins Gewicht fallen, da dieser nur stattfindet, wenn
+tatsächlich leere Partitionen vorliegen.
 
 \subsection{Performance}
 
@@ -502,15 +503,12 @@ nahezu ideal ist.
   \label{fig:shm}
 \end{figure}
 
-Der gewählte Ansatz liefert trotz suboptimaler Ausnutzung der Device-Hardware
-gute Ergebnisse bezüglich der Ausführungszeit. Mit steigender Problemgröße
-lohnt sich der durch Kommunikation zwischen Host und Device entstehende
-Overhead immer mehr. Dies ist in Abbildung~\ref{fig:all} gezeigt, die für eine
-Reihe von Problemgrößen den Median der Ausführungszeit (je 100 Testläufe) für
-alle besprochenen Implementierungen gegenüberstellt. Erkennbar ist, dass der
-Einsatz von \texttt{CUDA} hier noch einmal rund 25\% Performace-Gewinn gegenüber
-der \texttt{OpenMP} Implementierung bei Ausnutzung aller Prozessor-Kerne liefern
-kann.
+Trotz suboptimaler Ausnutzung der Device-Hardware wurden akzeptable Ergebnisse
+bezüglich der Ausführungszeit erzielt. Dies ist in Abbildung~\ref{fig:all}
+gezeigt, die für eine Reihe von Problemgrößen den Median der Ausführungszeit
+(je 100 Testläufe) für alle besprochenen Implementierungen gegenüberstellt.
+Erkennbar ist, dass der Einsatz von \texttt{CUDA} hier einen ungefähr mit der
+\texttt{OpenMP} Implementierung vergleichbaren Performance-Gewinn liefert.
 
 \begin{figure}[htbp]
   \centering
@@ -526,13 +524,13 @@ Eine Anmerkung zu Beginn: Während der Entwicklung der
 \texttt{CUDA}-Implementierung kam es zu mehreren Zeitpunkten zu
 Programm-Fehlschlägen die durch Treiber-Probleme hervorgerufen wurden. Sollte
 z.B. das \texttt{demo}-Programm mit einem durch \texttt{CUDA} hervorgerufenen
-\texttt{unknown error} abstürzen hilft unter Umständen ein Neustart oder im
+\texttt{unknown error} abstürzen, hilft unter Umständen ein Neustart oder im
 schlimmsten Fall eine Neuinstallation des \texttt{NVIDIA}-Treibers (mittels des
 \texttt{CUDA-9.2}-Installers) ab.
 
 Zudem ist die Kompilation aufgrund der Nutzung einer \texttt{OpenMP 4.5}
 Features unter Ubuntu nur mit \texttt{gcc-8} möglich (obwohl \texttt{OpenMP 4.5}
-eigentlich ab \texttt{gcc 6} unterstützt sein sollte). Hier muss eventuell das
+eigentlich ab \texttt{gcc-6} unterstützt sein sollte). Hier muss eventuell das
 Makefile manuell modifiziert werden.
 
 \section{Demo}
@@ -540,17 +538,10 @@ Makefile manuell modifiziert werden.
 Wird aus dem Wurzelverzeichnis des Repositorys \texttt{make demo} ausgeführt,
 werden die verschiedenen Implementierungen auf das Beispiel-Bild
 \texttt{images/demo\_image.jpg} angewandt und die Ergebnisse dargestellt. Da
-die initialen Partitions-Schwerpunkte zufällig gewählt werden kann es unter
+die initialen Partitions-Schwerpunkte zufällig gewählt werden, kann es unter
 Umständen vorkommen, dass die Ergebnisse leicht unterschiedlich ausfallen
 (auch in Abhängigkeit der maximalen Anzahl von Iterationen).
 Abbildung~\ref{img:demoresults} zeigt ein Beispiel.
-
-\begin{figure}[htbp]
-  \centering
-    \includegraphics[width=\textwidth]{report/resources/demo_results.jpg}
-  \caption{Beispielhafte Demo Ergebnisse}
-  \label{img:demoresults}
-\end{figure}
 
 Mittel \texttt{make repairtest} kann außerdem für die verschiedenen
 Implementierungen der Mechanismus zur Reparatur leerer Partitionen überprüft
@@ -563,9 +554,16 @@ Abbildung~\ref{img:repairtest} gezeigt.
 
 \begin{figure}[htbp]
   \centering
+    \includegraphics[width=\textwidth]{report/resources/demo_results.jpg}
+  \caption{Beispielhafte Demo Ergebnisse}
+  \label{img:demoresults}
+\end{figure}
+
+\begin{figure}[htbp]
+  \centering
     \includegraphics[width=\textwidth]{report/resources/repairtest_results.jpg}
   \caption{Beispielhafte \texttt{make repairtest} Ausgabe}
-  \label{img:demoresults}
+  \label{img:repairtest}
 \end{figure}
 
 \section{Benchmark}
