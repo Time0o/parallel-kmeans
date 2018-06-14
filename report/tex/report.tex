@@ -528,7 +528,12 @@ Programm-Fehlschlägen die durch Treiber-Probleme hervorgerufen wurden. Sollte
 z.B. das \texttt{demo}-Programm mit einem durch \texttt{CUDA} hervorgerufenen
 \texttt{unknown error} abstürzen hilft unter Umständen ein Neustart oder im
 schlimmsten Fall eine Neuinstallation des \texttt{NVIDIA}-Treibers (mittels des
-\texttt{CUDA-9.2}-Installers ab.
+\texttt{CUDA-9.2}-Installers) ab.
+
+Zudem ist die Kompilation aufgrund der Nutzung einer \texttt{OpenMP 4.5}
+Features unter Ubuntu nur mit \texttt{gcc-8} möglich (obwohl \texttt{OpenMP 4.5}
+eigentlich ab \texttt{gcc 6} unterstützt sein sollte). Hier muss eventuell das
+Makefile manuell modifiziert werden.
 
 \section{Demo}
 
