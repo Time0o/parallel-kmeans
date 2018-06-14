@@ -34,6 +34,11 @@ BENCHMARK_PLOT=tool/plot.py
 
 DEMO_IMAGE=$(IMAGE_DIR)/demo_image.jpg
 DEMO_CLUSTERS=5
+DEMO_RESULT_OUT=$(REPORT_RESOURCE_DIR)/demo_results.jpg
+
+REPAIRTEST_IMAGE=$(IMAGE_DIR)/repairtest_image.bmp
+REPAIRTEST_CLUSTERS=2
+REPAIRTEST_RESULT_OUT=$(REPORT_RESOURCE_DIR)/repairtest_results.jpg
 
 # compilation settings #########################################################
 
@@ -103,7 +108,11 @@ $(REPORT_PDF_DIR)/report.pdf: $(REPORT_TEX_DIR)/report.tex $(REPORT_RESOURCE_DIR
 .PHONY: demo, profile, benchmark, clean
 
 demo: $(BUILD_DIR)/demo $(DEMO_IMAGE)
-	./$(BUILD_DIR)/demo $(DEMO_IMAGE) $(DEMO_CLUSTERS)
+	./$(BUILD_DIR)/demo $(DEMO_IMAGE) $(DEMO_CLUSTERS) $(DEMO_RESULT_OUT)
+
+repairtest: $(BUILD_DIR)/demo $(REPAIRTEST_IMAGE)
+	./$(BUILD_DIR)/demo $(REPAIRTEST_IMAGE) $(REPAIRTEST_CLUSTERS) \
+	$(REPAIRTEST_RESULT_OUT)
 
 profile: $(BUILD_DIR)/profile $(PROFILE_IMAGE)
 	./$(BUILD_DIR)/profile $(PROFILE_IMAGE) $(PROFILE_CLUSTERS)

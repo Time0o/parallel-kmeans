@@ -13,8 +13,8 @@ int main(int argc, char **argv)
     cv::Mat image;
     int n_clusters;
 
-    if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " IMAGE CLUSTERS\n";
+    if (argc < 4) {
+        std::cerr << "Usage: " << argv[0] << " IMAGE CLUSTERS RESULT_OUT\n";
         return -1;
     }
 
@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     std::string disp_title(argv[1]);
     cv::namedWindow(disp_title, cv::WINDOW_AUTOSIZE);
     cv::imshow(disp_title, win_mat);
-    cv::imwrite("report/resources/demo_results.jpg", win_mat);
+    cv::imwrite(argv[3], win_mat);
     try {
         cv::waitKey(0);
         cv::destroyWindow(disp_title);
