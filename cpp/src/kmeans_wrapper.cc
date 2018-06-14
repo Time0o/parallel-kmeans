@@ -13,9 +13,9 @@ void KmeansCWrapper::exec(cv::Mat const &image, size_t n_centroids) {
     for (int y = 0; y < image.rows; ++y) {
         for(int x = 0; x < image.cols; ++x) {
             int idx = y * image.cols + x;
-            pixels[idx].r = image.at<cv::Vec3b>(y, x)[0];
+            pixels[idx].r = image.at<cv::Vec3b>(y, x)[2];
             pixels[idx].g = image.at<cv::Vec3b>(y, x)[1];
-            pixels[idx].b = image.at<cv::Vec3b>(y, x)[2];
+            pixels[idx].b = image.at<cv::Vec3b>(y, x)[0];
         }
     }
 
@@ -41,9 +41,9 @@ void KmeansCWrapper::exec(cv::Mat const &image, size_t n_centroids) {
     for (int y = 0; y < image.rows; ++y) {
         for (int x = 0; x < image.cols; ++x) {
             int label = labels[y * image.cols + x];
-            result.at<cv::Vec3b>(y, x)[0] = centroids[label].r;
+            result.at<cv::Vec3b>(y, x)[2] = centroids[label].r;
             result.at<cv::Vec3b>(y, x)[1] = centroids[label].g;
-            result.at<cv::Vec3b>(y, x)[2] = centroids[label].b;
+            result.at<cv::Vec3b>(y, x)[0] = centroids[label].b;
         }
     }
 }
