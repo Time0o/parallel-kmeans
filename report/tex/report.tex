@@ -271,17 +271,18 @@ angewandt. Die Programme wurden auf einer Maschine mit einem \texttt{Intel Core
 i5D-4690} Prozessor mit vier Prozessor-Kernen getestet. Die Boxplots lassen
 erkennen, in welchem Bereich sich die Ausführungszeiten jeweils befinden und
 wie groß ihre Streuung ist. Die gestrichtelte Linie verläuft durch die Mediane
-der Ausführungszeiten und zeigt wie zu erwarten in beiden Fällen eine lineare
-Abhängigkeit der Ausführungszeit von der Anzahl der Pixel auf.
+der Ausführungszeiten.
 
 Abbildung~\ref{img:compspeedup} zeigt für dieselben Bild-Dimensionen jeweils
-den Durchschnitt des durch die Nutzung von \texttt{OpenMP} erreichten Speedup.
+den Durchschnitt des durch die Nutzung von \texttt{OpenMP} erreichten Speedup
+bei Variation der genutzten Prozessor-Kerne\footnote{Jeweils mittels
+\texttt{omp\_set\_num\_threads()} konfiguriert.}.
+
 Es lässt sich erkennen, dass für angemessene Problemgrößen ein Speedup, der
 ungefähr im Bereich der Anzahl der zur Verfügung stehenden Prozessorkerne
-\footnote{Jeweils mittels \texttt{omp\_set\_num\_threads()} konfiguriert.},
-wobei der Geschwindigkeitsgewinn mit steigender Prozessoranzahl jedoch immer
-kleiner ausfällt. Gleichzeitig ist bei Nutzung von mehreren Kernen die
-Schwankung der Ausführungszeiten größer.
+liegt, erreicht werden konnte.  Dabei fällt der Geschwindigkeitsgewinn mit
+steigender Prozessoranzahl jedoch immer kleiner aus. Gleichzeitig ist bei
+Nutzung von mehreren Kernen die Schwankung der Ausführungszeiten größer.
 
 \begin{figure}[htbp]
   \centering
@@ -312,10 +313,10 @@ Schwankung der Ausführungszeiten größer.
 
 Listing~\ref{lst:kmeanscuda} zeigt die mittels \texttt{CUDA} parallelisierte
 Version des Programms. Im Gegensatz zur \texttt{OpenMP} Variante unterscheidet
-diese sich deutlich vom reinen C-Code. Die Performance kritische Zuweisung von
+diese sich deutlich vom reinen C-Code. Die Performance-kritische Zuweisung von
 Pixeln zu Partitionen sowie die Neuberechnung der Schwerpunkte sind mittels auf
 der Grafikkarte (nachfolgend \texttt{Device}) ausgeführten \texttt{Kerneln}
-realisiert (letzterer dient hauptsächlich dazu unnötiges Übertragen von
+realisiert (letzterer dient hauptsächlich dazu, unnötiges Übertragen von
 Zwischenergebnissen von Device zu Host zu vermeiden). Beide Kernel sind so
 geschrieben, dass sie prinzipiell mit einer beliebigen Anzahl von Blöcken und
 Threads ausgeführt werden können, die Implementierung nutzt jedoch eine
@@ -334,10 +335,10 @@ Reduktion von Arrays bietet. Diese musste dementsprechend in
 den \texttt{reassign} und \texttt{average} Kerneln explizit implementiert
 werden.
 
-Der \texttt{reassign} Kernel lädt zunächst in Zeile 49 die Schwerpunkte in ein
+Der \texttt{reassign} Kernel lädt zunächst die Schwerpunkte in ein
 \texttt{shared memory} Segment, um den wiederholten lesenden Zugriff aller
 Threads in diesem Block auf die Schwerpunkte zu beschleunigen. In den Zeilen
-64-90 wird anschließend äquivalent zur \texttt{OpenMP}-Implementierung pro
+63-89 wird anschließend äquivalent zur \texttt{OpenMP}-Implementierung pro
 Thread der zu einem Pixel nächste Schwerpunkt ermittelt. In Zeile 92 beginnt
 dann die Reduktion welche die \texttt{sums} und \texttt{counts} Arrays
 aktualisiert und die Nutzung kritischer Abschnitte umgeht. Dabei wird der
@@ -383,19 +384,20 @@ Host-Zeigern) zeigen folgenden Inhalt:
 \vspace{10pt}
 
 D.h. es existiert dann in diesen Speicherbereichen pro Block für den der Kernel
-ausgeführt worden aneinandergereiht Arrays deren Dimensionen bereits denen der
+ausgeführt wurde aneinandergereiht Arrays, deren Dimensionen denen der
 Host-Speicherbereichen auf die die Host-Zeiger \texttt{sums} und
 \texttt{counts} zeigen entsprechen und die jeweils den Beitrag aller in dem
-jeweiligen Block betrachteten Pixeln darstellen.
+jeweiligen Block betrachteten Pixel zu diesen Arrays darstellen.
 
 Die Reduktion erfolgt dabei für beide Arrays in
-$log_2\left(\left|Threads\right|\right)$ Schritten. Dabei wird zunächst in
-Zeilen 94-101 im \texttt{shared memory} Segment für jeden Thread genau dann
-wenn der für den zum Thread gehörige Pixel bestimmte nächstgelegene Schwerpunkt
-in der aktuell betrachteten Partition liegt dessen Wert und eine eins (für die
-Bestimmung der Partitionsgröße) im \texttt{shared memory} Segment abgelegt.
+$log_2\left(\left|Threads\right|\right)$ Schritten. Zunächst werden in den
+Zeilen 93-101 für jeden Thread genau dann wenn der für den zum Thread gehörigen
+Pixel bestimmte nächstgelegene Schwerpunkt in der aktuell betrachteten
+Partition liegt dessen Wert und eine eins (für die Bestimmung der
+Partitionsgröße) im \texttt{shared memory} Segment abgelegt.
+
 Anschließend werden diese Werte nach folgendem Schema schrittweise addiert um
-die entsprechenden Werte für den gesamten Block zu erhalten (hier
+die entsprechenden Werte für den gesamten Block zu ermitteln (hier
 beispielsweise für acht Threads pro Block):
 
 \vspace{20pt}
@@ -448,13 +450,25 @@ beispielsweise für acht Threads pro Block):
 
 \vspace{20pt}
 
-Im \texttt{average} Kernel findet weiterer ähnlicher Reduktionsschritt statt
-der diese Arrays aufsummiert und so die gewünschten Partitions-Summen und
-Größen ermittelt mit deren Hilfe dann die neuen Partitions-Schwerpunkte
-berechnet werden.
+Im \texttt{average} Kernel wird die Reduktion schließlich abgeschlossen, indem
+diese Arrays nach dem gleichen Schema in den Zeilen 176-190 blockweise
+aufsummiert werden. Anschließend sind die Partitions-Summen und -Größen
+ermittelt mit deren Hilfe dann in den Zeilen 193-201 die neuen
+Partitions-Schwerpunkte berechnet werden.
 
-Dieser Ansatz umgeht zwar den Einsatz atomarer Operation und kritischer
-Abschnitte die seriell abgearbeitet werden müssen und damit zu starken
+Die Reparatur leerer Partitionen ist ebenfalls mittels Device-Code
+implementiert, allerdings aufgrund der komplizierten Struktur der \texttt{sums}
+und \texttt{counts} Arrays stark vereinfacht. Hier wird ein einzelner Thread
+gestartet, der nacheinander in leere Partition die halbe akkumulierte Summe
+einer anderen Partition überträgt. Dieser Prozess könnte auch auf dem Host
+durchgeführt werden, wobei dann allerdings größerer Datenaustausch zwischen
+Host und Device nötig wäre. Da dieser Abschnitt Performance-unkritisch ist, ist
+die genaue Implementierung hier nicht entscheidend.
+
+\subsection{Performance}
+
+Der gewählte Ansatz umgeht zwar den Einsatz atomarer Operation und kritischer
+Abschnitte, die seriell abgearbeitet werden müssen und damit zu starken
 Performance-Einbußen führen, resultiert aber trotzdem durch die vielen
 benötigten Thread-Synchronisations-Punkte nicht in einer optimalen GPU
 Auslastung. Mit \texttt{NVIDIA Nsight} lässt sich ermitteln, dass rund die
@@ -488,26 +502,15 @@ nahezu ideal ist.
   \label{fig:shm}
 \end{figure}
 
-Die Reparatur leerer Partitionen ist ebenfalls mittels Device-Code
-implementiert, allerdings aufgrund der komplizierten Struktur der \texttt{sums}
-und \texttt{counts} Arrays stark vereinfacht. Hier wird ein einzelner Thread
-gestartet, der nacheinander in leere Partition die halbe akkumulierte Summe
-einer anderen Partition überträgt. Dieser Prozess könnte auch auf dem Host
-durchgeführt werden, wobei dann allerdings größerer Datenaustausch zwischen
-Host und Device nötig wäre. Da dieser Abschnitt Performance-unkritisch ist, ist
-die genaue Implementierung hier nicht entscheidend.
-
-\subsection{Performance}
-
 Der gewählte Ansatz liefert trotz suboptimaler Ausnutzung der Device-Hardware
-gute Ergebnisse bezüglich der Ausführungszeit. Für eine kleine Pixel- Anzahl
-überwiegt der durch das Starten von Kerneln und Kommunikation zwischen Host und
-Device bedingte Overhead TODO. Aufgrund des deutlich größeren Anzahl paralleler
-Prozessoren im Vergleich zur CPU lohnt sich dieser Overhead aber für das
-getestete System bei zunehmender Problemgröße. Dies ist in
-Abbildung~\ref{fig:all} gezeigt, die für eine Reihe von Problemgrößen den
-Median der Ausführungszeit (je 100 Testläufe) für alle besprochenen
-Implementierungen gegenüberstellt.
+gute Ergebnisse bezüglich der Ausführungszeit. Mit steigender Problemgröße
+lohnt sich der durch Kommunikation zwischen Host und Device entstehende
+Overhead immer mehr. Dies ist in Abbildung~\ref{fig:all} gezeigt, die für eine
+Reihe von Problemgrößen den Median der Ausführungszeit (je 100 Testläufe) für
+alle besprochenen Implementierungen gegenüberstellt. Erkennbar ist, dass der
+Einsatz von \texttt{CUDA} hier noch einmal rund 25\% Performace-Gewinn gegenüber
+der \texttt{OpenMP} Implementierung bei Ausnutzung aller Prozessor-Kerne liefern
+kann.
 
 \begin{figure}[htbp]
   \centering
@@ -535,13 +538,29 @@ werden die verschiedenen Implementierungen auf das Beispiel-Bild
 die initialen Partitions-Schwerpunkte zufällig gewählt werden kann es unter
 Umständen vorkommen, dass die Ergebnisse leicht unterschiedlich ausfallen
 (auch in Abhängigkeit der maximalen Anzahl von Iterationen).
-Abbildung~\ref{img:demoresults} zeigt ein Beispiel
+Abbildung~\ref{img:demoresults} zeigt ein Beispiel.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=\textwidth]{report/resources/demo_results.jpg}
-\caption{Beispielhafte Demo Ergebnisse}
-\label{img:demoresults}
+\begin{figure}[htbp]
+  \centering
+    \includegraphics[width=\textwidth]{report/resources/demo_results.jpg}
+  \caption{Beispielhafte Demo Ergebnisse}
+  \label{img:demoresults}
+\end{figure}
+
+Mittel \texttt{make repairtest} kann außerdem für die verschiedenen
+Implementierungen der Mechanismus zur Reparatur leerer Partitionen überprüft
+werden. Dabei wird der Algorithmus für zwei Partitionen auf ein überwiegend
+einfarbiges Bild angewandt. Hier ist die Wahrscheinlichkeit, dass Anfangs beide
+(zufällig gewählte) Partitions-Schwerpunkte identisch sind entsprechend hoch.
+Bei korrektem Reparatur-Mechanismus sollten im Ergebnis dennoch immer zwei
+farblich unterschiedliche Partitionen zu sehen sein, wie in
+Abbildung~\ref{img:repairtest} gezeigt.
+
+\begin{figure}[htbp]
+  \centering
+    \includegraphics[width=\textwidth]{report/resources/repairtest_results.jpg}
+  \caption{Beispielhafte \texttt{make repairtest} Ausgabe}
+  \label{img:demoresults}
 \end{figure}
 
 \section{Benchmark}
@@ -549,12 +568,15 @@ Abbildung~\ref{img:demoresults} zeigt ein Beispiel
 Bei Ausführung von \texttt{make benchmark} werden die Implementierungen
 hingegen entsprechend der im \texttt{Makefile} gesetzten Parameter auf zufällig
 generierte Bilder verschiedener Größen mit variierenden Partitions-Größen
-angewandt und jeweils die Ausführungszeiten in \texttt{.csv} Datein im
-\texttt{benchmarks} Verzeichnis protokolliert. Mit dem Python script
-\texttt{tool/plot} können die Ergbenisse visualisiert werden, dazu muss
-\texttt{./tool/plot benchmarks} ausgerufen werden (passiert bei Ausführung von
-\texttt{make benchmark} automatisch). Die resultierenden Grafiken finden sich
-unter \texttt{report/resources} und über diesen Bericht verteilt.
+angewandt und jeweils die Ausführungszeiten\footnote{``wall-clock-time'',
+gemessen mit \texttt{omp\_get\_wtime()}} in \texttt{.csv} Datein im
+\texttt{benchmarks} Verzeichnis protokolliert (zur Neugenerierung von
+Benchmark-Daten müssen dabei vorher existierende \texttt{.csv} Dateien gelöscht
+werden). Mit dem Python script \texttt{tool/plot} können die Ergbenisse
+visualisiert werden, dazu muss \texttt{./tool/plot benchmarks} ausgerufen
+werden (passiert bei Ausführung von \texttt{make benchmark} automatisch). Die
+resultierenden Grafiken finden sich unter \texttt{report/resources} und über
+diesen Bericht verteilt.
 
 \chapter{Quellcode}
 
