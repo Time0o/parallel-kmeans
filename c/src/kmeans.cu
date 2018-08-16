@@ -12,12 +12,12 @@ extern "C" {
 
 /* Helper Functions ***********************************************************/
 
-#define cudaAssert(code, file, line) do {                  \
-  if (code != cudaSuccess) {                               \
+#define cudaAssert(code, file, line) do { \
+  if (code != cudaSuccess) { \
     fprintf(stderr, "A CUDA error occurred: %s (%s:%d)\n", \
-            cudaGetErrorString(code), file, line);         \
-    exit(code);                                            \
-  }                                                        \
+            cudaGetErrorString(code), file, line); \
+    exit(code); \
+  } \
 } while(0)
 
 #define cudaCheck(code) do { cudaAssert(code, __FILE__, __LINE__); } while(0)
