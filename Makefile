@@ -12,11 +12,6 @@ CONFIG_DIR=config
 BENCHMARK_OUT_DIR=benchmarks
 BUILD_DIR=build
 IMAGE_DIR=images
-REPORT_DIR=report
-REPORT_AUX_DIR=$(REPORT_DIR)/aux
-REPORT_PDF_DIR=$(REPORT_DIR)/pdf
-REPORT_RESOURCE_DIR=$(REPORT_DIR)/resources
-REPORT_TEX_DIR=$(REPORT_DIR)/tex
 
 # parameters ###################################################################
 
@@ -89,19 +84,6 @@ $(CPP_OBJ_DIR)/%.o: $(CPP_SRC_DIR)/%.cc \
   $(C_INCLUDE_DIR)/kmeans.h $(CONFIG_DIR)/kmeans_config.h \
   $(CPP_INCLUDE_DIR)/kmeans_wrapper.h
 	$(CC_CPP) -c -o $@ $< $(CPP_CFLAGS)
-
-# build report #################################################################
-
-define run_pdflatex
-  pdflatex -halt-on-error -shell-escape -output-directory $(REPORT_AUX_DIR) $< > /dev/null
-endef
-
-report: $(REPORT_PDF_DIR)/report.pdf
-
-$(REPORT_PDF_DIR)/report.pdf: $(REPORT_TEX_DIR)/report.tex $(REPORT_RESOURCE_DIR)/*
-	$(call run_pdflatex)
-	$(call run_pdflatex)
-	-@mv $(REPORT_AUX_DIR)/report.pdf $(REPORT_PDF_DIR)
 
 # PHONY rules ##################################################################
 
